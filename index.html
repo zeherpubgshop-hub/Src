@@ -8,9 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════════════
-   CSS VARIABLES & RESET
-══════════════════════════════════════════════════════════ */
 :root{
   --wa:#25D366;--wa2:#128C7E;
   --bg:#05080f;--bg2:#080d18;--bg3:#0c1220;--bg4:#0f1628;
@@ -28,10 +25,7 @@ body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse
 #ptc{position:fixed;inset:0;z-index:0;pointer-events:none}
 .sw{position:relative;z-index:2}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--blue2);border-radius:3px}
-
-/* ═══════════════════════════════════════════════════════════
-   HEADER
-══════════════════════════════════════════════════════════ */
+/* HEADER */
 header{position:sticky;top:0;z-index:200;background:rgba(5,8,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 18px}
 header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),var(--blue),transparent);opacity:.35}
 .hi{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:12px;flex-wrap:wrap;padding:8px 0}
@@ -40,10 +34,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .lt{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:800;color:#fff;letter-spacing:2px;white-space:nowrap;text-shadow:0 0 20px rgba(79,143,255,0.4)}
 .lt span{color:var(--cyan)}
 .hn{display:flex;gap:8px;align-items:center;flex-shrink:0}
-
-/* ═══════════════════════════════════════════════════════════
-   BUTTONS
-══════════════════════════════════════════════════════════ */
+/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:5px;font-weight:700;font-size:.8rem;text-decoration:none;border:none;cursor:pointer;transition:all .2s;font-family:'Exo 2',sans-serif;white-space:nowrap;line-height:1;letter-spacing:.3px}
 .bwa{background:linear-gradient(135deg,#25D366,#0e7a4a);color:#fff;box-shadow:0 3px 16px rgba(37,211,102,0.22);border:1px solid rgba(37,211,102,0.28)}
 .bwa:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(37,211,102,0.38)}
@@ -51,10 +42,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .big:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(220,39,67,0.38)}
 .bgh{background:rgba(79,143,255,0.06);color:var(--muted);border:1px solid var(--border)}
 .bgh:hover{color:var(--text);border-color:var(--border2);background:rgba(79,143,255,0.1)}
-
-/* ═══════════════════════════════════════════════════════════
-   HERO
-══════════════════════════════════════════════════════════ */
+/* HERO */
 .hero{max-width:1240px;margin:0 auto;padding:52px 18px 38px;text-align:center;position:relative}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(79,143,255,0.07);border:1px solid rgba(79,143,255,0.18);color:var(--blue);padding:5px 16px;border-radius:3px;font-size:.68rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;font-family:'Orbitron',monospace}
 .eyebrow::before{content:'';width:6px;height:6px;min-width:6px;border-radius:50%;background:var(--cyan);animation:blink 1.6s ease-in-out infinite;box-shadow:0 0 8px var(--cyan)}
@@ -69,10 +57,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .ti small{font-size:.7rem;color:var(--muted);letter-spacing:.5px}
 .hctas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .hctas .btn{font-size:.9rem;padding:11px 22px}
-
-/* ═══════════════════════════════════════════════════════════
-   LOADING SCREEN
-══════════════════════════════════════════════════════════ */
+/* LOADING SCREEN */
 #loading-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
 .ls-logo{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:3px;text-shadow:0 0 20px rgba(79,143,255,0.5)}
 .ls-logo span{color:var(--cyan)}
@@ -80,29 +65,13 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .ls-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:3px;animation:lsfill 1.8s ease-in-out infinite}
 @keyframes lsfill{0%{width:0%;margin-left:0}50%{width:80%;margin-left:0}100%{width:0%;margin-left:100%}}
 .ls-text{font-family:'Orbitron',monospace;font-size:.62rem;color:var(--muted);letter-spacing:2px;animation:blink 1.5s infinite}
-
-/* ═══════════════════════════════════════════════════════════
-   FIREBASE STATUS
-══════════════════════════════════════════════════════════ */
+/* FIREBASE STATUS */
 .fb-status{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-family:'Orbitron',monospace;padding:3px 9px;border-radius:3px;border:1px solid var(--border)}
 .fb-status.ok{color:#25D366;border-color:rgba(37,211,102,0.3)}
 .fb-status.err{color:var(--red);border-color:rgba(255,60,60,0.3)}
 .fb-status.loading{color:var(--muted)}
 .fb-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-
-/* ═══════════════════════════════════════════════════════════
-   SEARCH BAR (NEW)
-══════════════════════════════════════════════════════════ */
-.search-wrap{max-width:1240px;margin:0 auto 16px;padding:0 18px}
-.search-inp-wrap{position:relative;max-width:480px}
-.search-inp-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted)}
-.search-inp{width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px 10px 38px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.88rem;outline:none;transition:border .2s}
-.search-inp:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,143,255,0.07)}
-.search-inp::placeholder{color:rgba(90,116,148,.55)}
-
-/* ═══════════════════════════════════════════════════════════
-   STOCK SECTION
-══════════════════════════════════════════════════════════ */
+/* STOCK */
 .ssec{max-width:1240px;margin:0 auto;padding:0 18px 52px;position:relative;z-index:2}
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px;flex-wrap:wrap}
 .stitle{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;color:#fff;letter-spacing:2px;display:flex;align-items:center;gap:8px}
@@ -111,10 +80,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .ft{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:3px;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;letter-spacing:1px}
 .ft.on,.ft:hover{background:rgba(79,143,255,0.1);border-color:var(--blue);color:var(--blue)}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
-
-/* ═══════════════════════════════════════════════════════════
-   CARD
-══════════════════════════════════════════════════════════ */
+/* CARD */
 .sc{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .3s;position:relative;display:flex;flex-direction:column}
 .sc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,143,255,0.035),transparent);opacity:0;transition:opacity .3s;pointer-events:none;border-radius:8px}
 .sc:hover{transform:translateY(-5px);border-color:rgba(79,143,255,0.38);box-shadow:0 18px 48px rgba(0,0,0,.55),0 0 28px rgba(79,143,255,0.07)}
@@ -122,8 +88,6 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .sc.sold{opacity:.5;pointer-events:none;filter:grayscale(.35)}
 .ciw{position:relative;flex-shrink:0}
 .ci{width:100%;aspect-ratio:4/3;object-fit:cover;background:#040810;display:block}
-/* NEW: video element styling */
-.cv{width:100%;aspect-ratio:4/3;object-fit:cover;background:#040810;display:block}
 .cip{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--bg4),var(--bg3));display:flex;align-items:center;justify-content:center;font-size:3.2rem}
 .sbadge{position:absolute;top:9px;right:9px;font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:2px;letter-spacing:2px;text-transform:uppercase;font-family:'Orbitron',monospace}
 .sbadge.sold-b{background:rgba(255,50,50,0.92);color:#fff;box-shadow:0 2px 8px rgba(255,50,50,0.4)}
@@ -139,30 +103,17 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .td{background:rgba(79,143,255,0.14);color:var(--blue);border:1px solid rgba(79,143,255,0.3)}
 .cb{padding:13px;flex:1;display:flex;flex-direction:column}
 .ctitle{font-family:'Orbitron',monospace;font-size:.76rem;font-weight:700;color:#fff;margin-bottom:5px;line-height:1.4;letter-spacing:.4px;word-break:break-word}
-.cdesc{font-size:.78rem;color:var(--muted);margin-bottom:8px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
-
-/* NEW: tag pills on cards */
-.ctags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
-.ctag{font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;font-family:'Orbitron',monospace;background:rgba(79,143,255,0.1);color:var(--blue);border:1px solid rgba(79,143,255,0.2)}
-
+.cdesc{font-size:.78rem;color:var(--muted);margin-bottom:11px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
 .cf{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:auto;flex-wrap:wrap}
 .cprice{font-family:'Orbitron',monospace;font-size:.88rem;font-weight:800;color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.28);flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cprice.fp{color:var(--cyan);font-size:.75rem}
 .ccta{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#25D366,#0e7a4a);color:#fff;padding:7px 12px;border-radius:4px;font-size:.72rem;font-weight:800;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;font-family:'Exo 2',sans-serif}
 .ccta:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(37,211,102,0.32)}
-
-/* NEW: Premium Highlight button on cards */
-.chl{display:inline-flex;align-items:center;gap:5px;background:rgba(255,215,0,0.08);color:var(--gold);padding:6px 11px;border-radius:4px;font-size:.68rem;font-weight:800;border:1px solid rgba(255,215,0,0.2);cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;font-family:'Exo 2',sans-serif;margin-top:8px;width:100%;justify-content:center}
-.chl:hover{background:rgba(255,215,0,0.14);box-shadow:0 3px 12px rgba(255,215,0,0.18)}
-
 .empty{grid-column:1/-1;text-align:center;padding:56px 20px}
 .empty .ei{font-size:2.8rem;margin-bottom:12px}
 .empty h3{font-family:'Orbitron',monospace;font-size:.9rem;color:var(--text);margin-bottom:8px;letter-spacing:1px}
 .empty p{color:var(--muted);font-size:.84rem;margin-bottom:14px}
-
-/* ═══════════════════════════════════════════════════════════
-   ORDER MODAL
-══════════════════════════════════════════════════════════ */
+/* ORDER MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
 .modal-bg.open{display:flex}
 .modal{background:linear-gradient(160deg,#111a2e,#0a1020);border:1px solid var(--border2);border-radius:10px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative}
@@ -182,33 +133,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .btn-order:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(255,215,0,0.35)}
 .btn-cancel{width:100%;background:none;border:1px solid var(--border);border-radius:6px;padding:11px;font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;color:var(--muted);margin-top:8px;transition:all .2s}
 .btn-cancel:hover{color:var(--text);border-color:var(--border2)}
-
-/* ═══════════════════════════════════════════════════════════
-   PREMIUM HIGHLIGHT MODAL (NEW)
-══════════════════════════════════════════════════════════ */
-.hl-modal{background:linear-gradient(160deg,#111a2e,#0a1020);border:1px solid rgba(255,215,0,0.3);border-radius:10px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative}
-.hl-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--cyan),var(--gold));border-radius:10px 10px 0 0}
-.hl-head{padding:22px 22px 14px;text-align:center;border-bottom:1px solid rgba(255,215,0,0.12)}
-.hl-head h2{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:800;color:var(--gold);letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 20px rgba(255,215,0,0.3);margin-bottom:6px}
-.hl-head p{font-size:.76rem;color:var(--muted)}
-.hl-body{padding:20px 22px 22px}
-.hl-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
-.hl-row:last-child{border-bottom:none}
-.hl-key{font-family:'Orbitron',monospace;font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
-.hl-val{font-size:.84rem;font-weight:600;color:var(--text);text-align:right;max-width:68%}
-.hl-val.gold{color:var(--gold);font-family:'Orbitron',monospace;font-size:.9rem}
-.hl-val.cyan{color:var(--cyan)}
-.hl-desc{background:rgba(79,143,255,0.04);border:1px solid var(--border);border-radius:6px;padding:13px;margin:14px 0;font-size:.82rem;color:var(--text);line-height:1.7}
-.hl-tags{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0}
-.hl-tag{font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:2px;letter-spacing:1.5px;text-transform:uppercase;font-family:'Orbitron',monospace;background:rgba(0,212,255,0.08);color:var(--cyan);border:1px solid rgba(0,212,255,0.22)}
-.hl-cta{width:100%;background:linear-gradient(135deg,#25D366,#0e7a4a);color:#fff;border:none;border-radius:6px;padding:13px;font-family:'Orbitron',monospace;font-size:.78rem;font-weight:800;letter-spacing:2px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
-.hl-cta:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(37,211,102,0.35)}
-.hl-close{width:100%;background:none;border:1px solid var(--border);border-radius:6px;padding:10px;font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;color:var(--muted);margin-top:8px;transition:all .2s}
-.hl-close:hover{color:var(--text);border-color:var(--border2)}
-
-/* ═══════════════════════════════════════════════════════════
-   FAQ
-══════════════════════════════════════════════════════════ */
+/* FAQ */
 .fw{max-width:800px;margin:0 auto 52px;padding:0 18px;position:relative;z-index:2}
 .ftitle{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:16px;letter-spacing:2px;display:flex;align-items:center;gap:8px}
 .ftitle::before{content:'//';color:var(--cyan);font-size:.75rem}
@@ -220,25 +145,16 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .fa{max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;padding:0 16px;color:var(--muted);font-size:.84rem;line-height:1.7}
 .fi.op .farr{transform:rotate(180deg)}
 .fi.op .fa{max-height:400px;padding-bottom:14px}
-
-/* ═══════════════════════════════════════════════════════════
-   FOOTER
-══════════════════════════════════════════════════════════ */
+/* FOOTER */
 footer{border-top:1px solid var(--border);padding:22px 18px;text-align:center;color:var(--muted);font-size:.8rem;position:relative;z-index:2}
 footer a{color:var(--blue);text-decoration:none}
 footer a:hover{color:var(--cyan)}
-
-/* ═══════════════════════════════════════════════════════════
-   FAB
-══════════════════════════════════════════════════════════ */
+/* FAB */
 .fab{position:fixed;right:16px;bottom:16px;z-index:300;display:flex;align-items:center;gap:9px}
 .fabbt{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;background:linear-gradient(135deg,#25D366,#0e7a4a);box-shadow:0 5px 22px rgba(37,211,102,0.32);transition:all .2s}
 .fabbt:hover{transform:scale(1.1);box-shadow:0 9px 30px rgba(37,211,102,0.48)}
 .fabl{background:var(--card2);border:1px solid var(--border);padding:6px 12px;border-radius:5px;font-size:.75rem;font-weight:700;color:var(--text);white-space:nowrap;font-family:'Orbitron',monospace;letter-spacing:.5px}
-
-/* ═══════════════════════════════════════════════════════════
-   LOGIN
-══════════════════════════════════════════════════════════ */
+/* LOGIN */
 #lv{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px}
 .lb{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:38px 30px;max-width:370px;width:100%;text-align:center;position:relative;overflow:hidden}
 .lb::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--blue))}
@@ -250,10 +166,7 @@ footer a:hover{color:var(--cyan)}
 .linp:focus{border-color:var(--blue)}
 .lblt{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:5px;padding:12px;font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s}
 .lblt:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(79,143,255,0.32)}
-
-/* ═══════════════════════════════════════════════════════════
-   ADMIN
-══════════════════════════════════════════════════════════ */
+/* ADMIN */
 #av{display:none;position:relative;z-index:2}
 .abar{background:rgba(8,13,24,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 18px;position:sticky;top:0;z-index:200}
 .abar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),var(--blue),transparent);opacity:.45}
@@ -271,66 +184,19 @@ footer a:hover{color:var(--cyan)}
 .fi2::placeholder,.fta::placeholder{color:rgba(90,116,148,.55)}
 .fta{resize:vertical;min-height:72px;line-height:1.5}
 .fse option{background:var(--bg2)}
-
-/* ── CHECKBOX DROPDOWN ─────────────────────────── */
-/* Shared component used for both Tier and Tags fields */
-.chkdrop{position:relative;width:100%}
-/* Trigger button — shows selected values or placeholder */
-.chkdrop-btn{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:9px 32px 9px 11px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.86rem;text-align:left;cursor:pointer;transition:border .2s;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chkdrop-btn:focus,.chkdrop-btn.open{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,143,255,0.07)}
-.chkdrop-btn .arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);transition:transform .2s;color:var(--muted);pointer-events:none;font-size:.7rem}
-.chkdrop-btn.open .arrow{transform:translateY(-50%) rotate(180deg)}
-.chkdrop-btn .placeholder{color:rgba(90,116,148,.55)}
-/* The dropdown panel */
-.chkdrop-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;z-index:400;box-shadow:0 8px 28px rgba(0,0,0,.55);max-height:220px;overflow-y:auto;display:none}
-.chkdrop-panel.open{display:block}
-.chkdrop-panel::-webkit-scrollbar{width:3px}
-.chkdrop-panel::-webkit-scrollbar-thumb{background:var(--blue2);border-radius:3px}
-/* Each checkbox row in the panel */
-.chkdrop-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;transition:background .15s;user-select:none}
-.chkdrop-item:hover{background:rgba(79,143,255,0.07)}
-.chkdrop-item input[type=checkbox],.chkdrop-item input[type=radio]{width:14px;height:14px;accent-color:var(--blue);flex-shrink:0;cursor:pointer}
-.chkdrop-item span{font-family:'Exo 2',sans-serif;font-size:.84rem;color:var(--text)}
-/* Divider + "Add new" row at the bottom */
-.chkdrop-add{border-top:1px solid var(--border);padding:8px 10px;display:flex;gap:6px}
-.chkdrop-add input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 9px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.8rem;outline:none;transition:border .2s}
-.chkdrop-add input:focus{border-color:var(--blue)}
-.chkdrop-add input::placeholder{color:rgba(90,116,148,.5)}
-.chkdrop-add button{background:rgba(79,143,255,0.1);border:1px solid rgba(79,143,255,0.25);color:var(--blue);border-radius:4px;padding:5px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;white-space:nowrap;transition:all .2s}
-.chkdrop-add button:hover{background:rgba(79,143,255,0.2)}
-
-/* Upload zone */
 .uz{border:2px dashed rgba(79,143,255,0.18);border-radius:6px;padding:24px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:rgba(79,143,255,0.015)}
 .uz:hover,.uz.ov{border-color:var(--blue);background:rgba(79,143,255,0.055)}
 .uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .uz .ui{font-size:1.8rem;margin-bottom:6px}
 .uz p{font-size:.76rem;color:var(--muted);margin:0;line-height:1.5}
 .uz p b{color:var(--blue)}
-
-/* NEW: Upload progress bar */
-.upbar-wrap{margin-top:9px;display:none}
-.upbar-wrap.vis{display:block}
-.upbar-bg{height:4px;background:rgba(79,143,255,0.12);border-radius:4px;overflow:hidden}
-.upbar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:4px;width:0%;transition:width .2s}
-.upbar-label{font-size:.66rem;color:var(--muted);font-family:'Orbitron',monospace;letter-spacing:.5px;margin-top:4px;text-align:center}
-
-/* Media preview (image or video) */
 .ip{width:100%;border-radius:5px;margin-top:9px;display:none;max-height:170px;object-fit:contain;background:var(--bg4);border:1px solid var(--border)}
-.vp{width:100%;border-radius:5px;margin-top:9px;display:none;max-height:170px;background:var(--bg4);border:1px solid var(--border)}
-
 .cr{display:flex;align-items:center;gap:8px;padding:5px 0}
 .cr input[type=checkbox]{width:15px;height:15px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
 .cr label{font-size:.84rem;color:var(--text);cursor:pointer}
 .bupl{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:6px;padding:12px;font-family:'Orbitron',monospace;font-size:.76rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:all .2s;margin-top:5px;display:flex;align-items:center;justify-content:center;gap:7px}
 .bupl:hover{transform:translateY(-2px);box-shadow:0 7px 22px rgba(79,143,255,0.28)}
 .bupl:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-/* NEW: Cancel edit button */
-.bcanc{width:100%;background:none;border:1px solid rgba(255,60,60,.2);color:#ff6b6b;border-radius:6px;padding:9px;font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;transition:all .2s;margin-top:6px;display:none}
-.bcanc:hover{background:rgba(255,60,60,.07)}
-.bcanc.vis{display:flex;align-items:center;justify-content:center;gap:6px}
-
-/* Admin stats header */
 .ash{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:13px 17px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;position:relative;overflow:hidden}
 .ash::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
 .astats{display:flex;gap:14px;flex-wrap:wrap}
@@ -342,7 +208,7 @@ footer a:hover{color:var(--cyan)}
 .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px}
 .adc{background:var(--bg3);border:1px solid var(--border);border-radius:7px;overflow:hidden;position:relative;transition:border .2s}
 .adc:hover{border-color:var(--border2)}
-.adc img,.adc video,.ano{width:100%;aspect-ratio:1;object-fit:contain;background:#040810;display:block}
+.adc img,.ano{width:100%;aspect-ratio:1;object-fit:contain;background:#040810;display:block}
 .ano{display:flex;align-items:center;justify-content:center;font-size:1.9rem}
 .asc{position:absolute;top:6px;left:6px;background:rgba(255,50,50,0.9);color:#fff;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:2px;letter-spacing:1px;font-family:'Orbitron',monospace}
 .adcb{padding:8px 10px}
@@ -354,27 +220,16 @@ footer a:hover{color:var(--cyan)}
 .bma{background:rgba(37,211,102,0.09);color:#25D366;border:1px solid rgba(37,211,102,0.2)}
 .bdl{background:rgba(255,60,60,0.05);color:#ff6b6b;border:1px solid rgba(255,60,60,0.13)}
 .bdl:hover{background:rgba(255,60,60,0.16)}
-
-/* NEW: Edit button in admin grid */
-.bedt{background:rgba(79,143,255,0.07);color:var(--blue);border:1px solid rgba(79,143,255,0.2)}
-.bedt:hover{background:rgba(79,143,255,0.16)}
-
 .aem{text-align:center;padding:40px 18px;border:2px dashed var(--border);border-radius:8px;color:var(--muted)}
 .aem .aei{font-size:2.2rem;margin-bottom:8px}
 .fb-note{background:rgba(79,143,255,0.05);border:1px solid rgba(79,143,255,0.15);border-radius:6px;padding:10px 13px;margin-bottom:14px;font-size:.76rem;color:var(--muted);line-height:1.6;display:flex;align-items:flex-start;gap:8px}
 .fb-note b{color:var(--cyan)}
-
-/* ═══════════════════════════════════════════════════════════
-   TOAST
-══════════════════════════════════════════════════════════ */
+/* TOAST */
 .toast{position:fixed;top:16px;right:16px;z-index:9999;background:var(--card2);border:1px solid var(--blue);color:var(--text);padding:11px 16px;border-radius:7px;font-weight:600;font-size:.8rem;transform:translateX(120%);transition:transform .3s;box-shadow:0 8px 28px rgba(0,0,0,.5);max-width:290px;font-family:'Exo 2',sans-serif}
 .toast.sh{transform:translateX(0)}
 .toast.er{border-color:var(--red);color:var(--red)}
 .toast.ok{border-color:var(--green);color:var(--green)}
-
-/* ═══════════════════════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════════════════════ */
+/* RESPONSIVE */
 @media(max-width:800px){.abody{grid-template-columns:1fr;padding:14px}.sgrid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){
   .sgrid{grid-template-columns:1fr}
@@ -433,19 +288,6 @@ footer a:hover{color:var(--cyan)}
   </div>
 </div>
 
-<!-- PREMIUM HIGHLIGHT MODAL (NEW) -->
-<div class="modal-bg" id="hlModal">
-  <div class="hl-modal">
-    <div class="hl-head">
-      <h2>⭐ Premium Highlight</h2>
-      <p>Full account breakdown for this listing</p>
-    </div>
-    <div class="hl-body" id="hl-body">
-      <!-- Populated dynamically by showHighlight() -->
-    </div>
-  </div>
-</div>
-
 <!-- PUBLIC VIEW -->
 <div id="pv" class="sw" style="display:none">
   <header>
@@ -466,7 +308,6 @@ footer a:hover{color:var(--cyan)}
       </nav>
     </div>
   </header>
-
   <section class="hero">
     <div class="eyebrow">🎮 TRUSTED · FAST · SECURE · VERIFIED</div>
     <h1>PREMIUM PUBG<br/><span class="g">MOBILE ACCOUNTS</span></h1>
@@ -488,20 +329,10 @@ footer a:hover{color:var(--cyan)}
       </a>
     </div>
   </section>
-
-  <!-- SEARCH BAR (NEW) -->
-  <div class="search-wrap">
-    <div class="search-inp-wrap">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="search-inp" id="searchInp" type="text" placeholder="Search accounts, tiers, skins..." oninput="searchFilter()"/>
-    </div>
-  </div>
-
   <section class="ssec">
     <div class="sh">
       <div class="stitle">AVAILABLE STOCK</div>
-      <!-- Filter tabs: ALL / AVAILABLE / SOLD + dynamic tag filters rendered by renderTagFilters() -->
-      <div class="ftabs" id="ftabs">
+      <div class="ftabs">
         <div class="ft on" onclick="filt('all',this)">ALL</div>
         <div class="ft" onclick="filt('available',this)">AVAILABLE</div>
         <div class="ft" onclick="filt('sold',this)">SOLD</div>
@@ -509,7 +340,6 @@ footer a:hover{color:var(--cyan)}
     </div>
     <div class="sgrid" id="sgrid"></div>
   </section>
-
   <div class="fw">
     <div class="ftitle">COMMON QUESTIONS</div>
     <div class="fi" onclick="tFaq(this)"><button class="fq">What is the 37-Day Unlinking Guarantee?<svg class="farr" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="fa">PUBG Mobile gives original owners a temporary window to reclaim an account. Our 37-day shield covers the full 30-day activity period plus the 7-day grace window — giving you complete, irreversible ownership.</div></div>
@@ -517,12 +347,10 @@ footer a:hover{color:var(--cyan)}
     <div class="fi" onclick="tFaq(this)"><button class="fq">What payment methods do you accept?<svg class="farr" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="fa">UPI (Google Pay / PhonePe / PayTM) and direct Bank Transfer. Crypto options available — discuss on WhatsApp.</div></div>
     <div class="fi" onclick="tFaq(this)"><button class="fq">Can I verify the account before paying?<svg class="farr" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></button><div class="fa">Yes! We send a live screen recording of the account's full inventory and stats on WhatsApp before any payment. Nothing hidden.</div></div>
   </div>
-
   <footer>
     <p style="margin-bottom:7px"><a href="https://instagram.com/zeherstore.shop" target="_blank">@zeherstore.shop</a> &nbsp;·&nbsp; <a href="https://wa.me/918982790894" target="_blank">+91 89827 90894</a></p>
     <p>&copy; <span id="fy"></span> ZEHER STORE — All rights reserved.</p>
   </footer>
-
   <div class="fab">
     <div class="fabl">Chat on WhatsApp</div>
     <a class="fabbt" href="https://wa.me/918982790894?text=Hi%20I'm%20interested%20in%20a%20PUBG%20account" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
@@ -559,112 +387,42 @@ footer a:hover{color:var(--cyan)}
       </div>
     </div>
   </div>
-
   <div class="abody">
-    <!-- LEFT PANEL: Upload / Edit Form -->
     <div class="ap">
-      <div class="apt" id="formTitle">📦 ADD NEW STOCK</div>
-
+      <div class="apt">📦 UPLOAD NEW STOCK</div>
       <div class="fb-note">
         <span>🔥</span>
-        <span><b>Firebase Connected</b> — Stock saves instantly to the cloud. Every customer on every device sees your stock in real time.</span>
+        <span><b>Firebase Connected</b> — Stock saves instantly to the cloud. Every customer on every device sees your stock in real time. Your PC being offline doesn't matter.</span>
       </div>
-      <div class="fb-note" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.04)">
-        <span>⚠️</span>
-        <span style="color:#c8a800"><b>Storage Rules:</b> If uploads fail, open Firebase Console → Storage → Rules and set: <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;font-size:.72rem">allow read, write: if true;</code> to allow unauthenticated uploads.</span>
-      </div>
-
-      <!-- Title -->
-      <div class="fg">
-        <label class="fl">Account Title *</label>
-        <input class="fi2" id="f1" type="text" placeholder="e.g. Conqueror Account – Poseidon X-Suit"/>
-      </div>
-
-      <!-- Description — plain textarea -->
-      <div class="fg">
-        <label class="fl">Description</label>
-        <textarea class="fta" id="f2" placeholder="Describe the account — skins, rank, weapons, special items..."></textarea>
-      </div>
-
-      <!-- Price -->
-      <div class="fg">
-        <label class="fl">Price</label>
-        <input class="fi2" id="f3" type="text" placeholder="e.g. ₹15,000 or Contact for Price"/>
-      </div>
-
-      <!-- Tier — single-select checkbox dropdown -->
+      <div class="fg"><label class="fl">Account Title *</label><input class="fi2" id="f1" type="text" placeholder="e.g. Conqueror Account – Poseidon X-Suit"/></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fta" id="f2" placeholder="e.g. Season 24 Conqueror, 200+ outfits, Glacier M416..."></textarea></div>
+      <div class="fg"><label class="fl">Price</label><input class="fi2" id="f3" type="text" placeholder="e.g. ₹15,000 or Contact for Price"/></div>
       <div class="fg">
         <label class="fl">Tier / Category</label>
-        <div class="chkdrop" id="tierDrop">
-          <button type="button" class="chkdrop-btn" id="tierBtn" onclick="toggleDropdown('tier')">
-            <span class="placeholder" id="tierLabel">— Select a tier —</span>
-            <span class="arrow">▼</span>
-          </button>
-          <div class="chkdrop-panel" id="tierPanel">
-            <!-- Radio items built by JS -->
-            <div class="chkdrop-add">
-              <input type="text" id="tierNewInp" placeholder="Add new tier..." onkeydown="if(event.key==='Enter'){event.preventDefault();addDropdownItem('tier')}"/>
-              <button onclick="addDropdownItem('tier')">+ ADD</button>
-            </div>
-          </div>
-        </div>
+        <select class="fse" id="f4">
+          <option value="">— Select tier (optional) —</option>
+          <option value="Bronze">Bronze Tier</option><option value="Silver">Silver Tier</option>
+          <option value="Gold">Gold Tier</option><option value="Platinum">Platinum Tier</option>
+          <option value="Diamond">Diamond Tier</option><option value="Crown">Crown Tier</option>
+          <option value="Ace">Ace Tier</option><option value="Conqueror">Conqueror Tier</option>
+          <option value="X-Suit">X-Suit Account</option>
+        </select>
       </div>
-
-      <!-- Tags — multi-select checkbox dropdown -->
       <div class="fg">
-        <label class="fl">Tags</label>
-        <div class="chkdrop" id="tagsDrop">
-          <button type="button" class="chkdrop-btn" id="tagsBtn" onclick="toggleDropdown('tags')">
-            <span class="placeholder" id="tagsLabel">— Select tags —</span>
-            <span class="arrow">▼</span>
-          </button>
-          <div class="chkdrop-panel" id="tagsPanel">
-            <!-- Checkbox items built by JS -->
-            <div class="chkdrop-add">
-              <input type="text" id="tagsNewInp" placeholder="Add new tag..." onkeydown="if(event.key==='Enter'){event.preventDefault();addDropdownItem('tags')}"/>
-              <button onclick="addDropdownItem('tags')">+ ADD</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Media Upload (image + video, with progress bar) -->
-      <div class="fg">
-        <label class="fl">Screenshot / Gameplay Clip</label>
+        <label class="fl">Account Screenshot</label>
         <div class="uz" id="uz">
-          <!-- Accept both image and video files -->
-          <input type="file" id="f5" accept="image/*,video/*" onchange="prvMedia(this)"/>
+          <input type="file" id="f5" accept="image/*" onchange="prvImg(this)"/>
           <div class="ui">🖼️</div>
-          <p><b>Click to upload</b> or drag & drop<br/>Images (PNG/JPG/WEBP) or Videos (MP4/MOV)</p>
+          <p><b>Click to upload</b> or drag & drop<br/>PNG · JPG · WEBP (max ~800KB for best speed)</p>
         </div>
-        <!-- Progress bar (hidden until upload starts) -->
-        <div class="upbar-wrap" id="upbarWrap">
-          <div class="upbar-bg"><div class="upbar-fill" id="upbarFill"></div></div>
-          <div class="upbar-label" id="upbarLabel">Uploading... 0%</div>
-        </div>
-        <!-- Image preview -->
         <img class="ip" id="ip" alt="Preview"/>
-        <!-- Video preview -->
-        <video class="vp" id="vp" muted playsinline controls></video>
       </div>
-
-      <!-- Sold checkbox -->
-      <div class="cr">
-        <input type="checkbox" id="f7"/>
-        <label for="f7">Mark as <strong>Sold</strong> immediately</label>
-      </div>
-
-      <!-- Submit button (text changes between ADD and UPDATE) -->
+      <div class="cr"><input type="checkbox" id="f7"/><label for="f7">Mark as <strong>Sold</strong> immediately</label></div>
       <button class="bupl" id="uplBtn" onclick="upStock()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
         ADD TO STOCK
       </button>
-
-      <!-- Cancel Edit button (only visible in edit mode) -->
-      <button class="bcanc" id="cancBtn" onclick="cancelEdit()">✕ CANCEL EDIT</button>
     </div>
-
-    <!-- RIGHT PANEL: Stock Grid -->
     <div>
       <div class="ash">
         <div>
@@ -685,23 +443,17 @@ footer a:hover{color:var(--cyan)}
 
 <div class="toast" id="tst"></div>
 
-<!-- FIREBASE SDK -->
+<!-- FIREBASE SDK (loaded from Google CDN - no install needed) -->
 <script type="module">
 // ═══════════════════════════════════════════════
-// FIREBASE IMPORTS — Firestore + Storage
+// FIREBASE CONFIG — your credentials are here
 // ═══════════════════════════════════════════════
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc,
-         updateDoc, deleteDoc, onSnapshot, query,
-         orderBy, writeBatch }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { initializeApp }                        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc,
+         getDocs, doc, updateDoc, deleteDoc,
+         onSnapshot, query, orderBy, writeBatch }
+                                                from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ═══════════════════════════════════════════════
-// FIREBASE CONFIG — your credentials
-// ═══════════════════════════════════════════════
 const firebaseConfig = {
   apiKey:            "AIzaSyAYscEi8c9YfN344O1LMMlVfc7VddRUojY",
   authDomain:        "zeher-store.firebaseapp.com",
@@ -711,35 +463,23 @@ const firebaseConfig = {
   appId:             "1:746291913056:web:9b855fe32e204c2cb2be05"
 };
 
-const app     = initializeApp(firebaseConfig);
-const db      = getFirestore(app);
-const storage = getStorage(app);
-const COL     = "stock";
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const COL = "stock"; // Firestore collection name
 
 // ═══════════════════════════════════════════════
 // GLOBALS
 // ═══════════════════════════════════════════════
-const PWD  = "zeher2024";   // ← Change your admin password here
+const PWD  = "zeher2024"; // ← CHANGE YOUR ADMIN PASSWORD HERE
 const HASH = "#admin-zeher";
 const WA   = "918982790894";
 
-let stock       = [];   // local mirror of Firestore data
-let cf          = 'all'; // current filter
-let searchQ     = '';    // current search query
-let loggedIn    = false;
-let activeItem  = null;
-let unsubscribe = null;
-let editId      = null;  // firestoreId of item being edited (null = add mode)
-let mediaFile   = null;  // currently selected File object for upload
-
-// ── Dropdown state ──────────────────────────────────
-// Tier: single-select (radio). Default options + any the admin adds.
-let tierOptions  = ['Bronze','Silver','Gold','Platinum','Diamond','Crown','Ace','Conqueror','X-Suit'];
-let selectedTier = '';   // single string
-
-// Tags: multi-select (checkboxes). Default options + any the admin adds.
-let tagOptions   = ['Mythic','Legendary','Glacier','Poseidon','Lamborghini','Ferrari','M416','AWM','UC','Season Pass','Elite Pass','X-Suit'];
-let selectedTags = [];   // array of strings
+let stock      = [];   // local mirror of Firestore data
+let cf         = 'all';
+let loggedIn   = false;
+let b64        = null;
+let activeItem = null;
+let unsubscribe= null; // real-time listener handle
 
 // ═══════════════════════════════════════════════
 // PARTICLES
@@ -759,115 +499,8 @@ let selectedTags = [];   // array of strings
 })();
 
 // ═══════════════════════════════════════════════
-// CHECKBOX DROPDOWN — shared component
-// type = 'tier' (single-select/radio) or 'tags' (multi-select/checkbox)
+// FIREBASE STATUS INDICATOR
 // ═══════════════════════════════════════════════
-
-/** Render all items inside a dropdown panel, inserting before the .chkdrop-add row */
-function buildDropdown(type){
-  const isTag  = type==='tags';
-  const opts   = isTag ? tagOptions   : tierOptions;
-  const panel  = document.getElementById(type+'Panel');
-  const addRow = panel.querySelector('.chkdrop-add');
-  // Remove previously rendered items (everything before the add row)
-  Array.from(panel.children).forEach(c=>{ if(c!==addRow) c.remove(); });
-  // Rebuild items
-  opts.forEach(opt=>{
-    const row = document.createElement('label');
-    row.className='chkdrop-item';
-    const inp = document.createElement('input');
-    inp.type  = isTag ? 'checkbox' : 'radio';
-    inp.name  = type+'Radio';
-    inp.value = opt;
-    if(isTag)  inp.checked = selectedTags.includes(opt);
-    else       inp.checked = selectedTier===opt;
-    inp.addEventListener('change',()=>{ onDropdownChange(type); });
-    const lbl = document.createElement('span');
-    lbl.textContent = opt;
-    row.appendChild(inp);
-    row.appendChild(lbl);
-    panel.insertBefore(row, addRow);
-  });
-  updateDropdownBtn(type);
-}
-
-/** Sync state arrays from DOM checkboxes/radios then refresh button label */
-function onDropdownChange(type){
-  const panel = document.getElementById(type+'Panel');
-  if(type==='tags'){
-    selectedTags = Array.from(panel.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
-  }else{
-    const checked = panel.querySelector('input[type=radio]:checked');
-    selectedTier  = checked ? checked.value : '';
-  }
-  updateDropdownBtn(type);
-}
-
-/** Update the trigger button text to show what's selected */
-function updateDropdownBtn(type){
-  const lbl = document.getElementById(type+'Label');
-  const btn = document.getElementById(type+'Btn');
-  if(type==='tags'){
-    if(selectedTags.length){
-      lbl.textContent = selectedTags.join(', ');
-      lbl.classList.remove('placeholder');
-    }else{
-      lbl.textContent = '— Select tags —';
-      lbl.classList.add('placeholder');
-    }
-  }else{
-    if(selectedTier){
-      lbl.textContent = selectedTier;
-      lbl.classList.remove('placeholder');
-    }else{
-      lbl.textContent = '— Select a tier —';
-      lbl.classList.add('placeholder');
-    }
-  }
-}
-
-/** Open/close a dropdown panel */
-function toggleDropdown(type){
-  const panel = document.getElementById(type+'Panel');
-  const btn   = document.getElementById(type+'Btn');
-  const other = type==='tier' ? 'tags' : 'tier';
-  // Close the other dropdown if open
-  document.getElementById(other+'Panel').classList.remove('open');
-  document.getElementById(other+'Btn').classList.remove('open');
-  // Toggle this one
-  const isOpen = panel.classList.toggle('open');
-  btn.classList.toggle('open', isOpen);
-}
-
-/** Add a new option typed into the "Add new" input */
-function addDropdownItem(type){
-  const inp   = document.getElementById(type+'NewInp');
-  const val   = inp.value.trim();
-  if(!val) return;
-  const opts  = type==='tags' ? tagOptions : tierOptions;
-  if(opts.some(o=>o.toLowerCase()===val.toLowerCase())){
-    tst('Option already exists',true); return;
-  }
-  opts.push(val);
-  // Auto-select the newly added item
-  if(type==='tags')  selectedTags.push(val);
-  else               selectedTier = val;
-  inp.value = '';
-  buildDropdown(type);
-}
-
-/** Close all dropdowns when clicking outside them */
-document.addEventListener('click',e=>{
-  ['tier','tags'].forEach(type=>{
-    const wrap = document.getElementById(type+'Drop');
-    if(wrap && !wrap.contains(e.target)){
-      document.getElementById(type+'Panel').classList.remove('open');
-      document.getElementById(type+'Btn').classList.remove('open');
-    }
-  });
-});
-
-
 function setFbStatus(state){
   const el=document.getElementById('fb-indicator');
   const lb=document.getElementById('fb-label');
@@ -877,21 +510,22 @@ function setFbStatus(state){
 }
 
 // ═══════════════════════════════════════════════
-// REAL-TIME LISTENER
+// REAL-TIME LISTENER — stock updates instantly
+// on ALL devices whenever anyone changes anything
 // ═══════════════════════════════════════════════
 function startLiveListener(){
-  const q=query(collection(db,COL),orderBy("addedAt","asc"));
-  unsubscribe=onSnapshot(q,
-    (snap)=>{
-      stock=snap.docs.map(d=>({firestoreId:d.id,...d.data()}));
+  const q = query(collection(db, COL), orderBy("addedAt","asc"));
+  unsubscribe = onSnapshot(q,
+    (snap) => {
+      stock = snap.docs.map(d => ({firestoreId: d.id, ...d.data()}));
       setFbStatus('ok');
       renderPub();
       if(loggedIn) renderAdm();
     },
-    (err)=>{
-      console.error("Firestore error:",err);
+    (err) => {
+      console.error("Firestore error:", err);
       setFbStatus('err');
-      tst('Firebase error: '+err.code,true);
+      tst('Firebase error: '+err.code, true);
     }
   );
 }
@@ -940,7 +574,7 @@ function doLogin(){
 function tc(t){return{Conqueror:'tC',Ace:'tA',Diamond:'tD',Crown:'tCr',Platinum:'tP',Gold:'tG','X-Suit':'tX'}[t]||'td'}
 
 // ═══════════════════════════════════════════════
-// WHATSAPP SVG ICON
+// WHATSAPP SVG
 // ═══════════════════════════════════════════════
 const WASVG=`<svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
 
@@ -948,44 +582,44 @@ const WASVG=`<svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path 
 // ORDER MODAL
 // ═══════════════════════════════════════════════
 function openOrder(firestoreId){
-  activeItem=stock.find(s=>s.firestoreId===firestoreId);
-  if(!activeItem)return;
-  document.getElementById('mo-account').textContent=activeItem.title;
-  document.getElementById('mo-price').textContent=activeItem.price||'Contact for Price';
+  activeItem = stock.find(s => s.firestoreId === firestoreId);
+  if(!activeItem) return;
+  document.getElementById('mo-account').textContent = activeItem.title;
+  document.getElementById('mo-price').textContent   = activeItem.price || 'Contact for Price';
   ['mo-name','mo-phone','mo-email','mo-address'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('mo-country').value='India';
+  document.getElementById('mo-country').value = 'India';
   document.getElementById('orderModal').classList.add('open');
   document.body.style.overflow='hidden';
   setTimeout(()=>document.getElementById('mo-name').focus(),200);
 }
 function closeModal(){
   document.getElementById('orderModal').classList.remove('open');
-  document.getElementById('hlModal').classList.remove('open');
   document.body.style.overflow='';
   activeItem=null;
 }
 document.getElementById('orderModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
-document.getElementById('hlModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
 
 function submitOrder(){
-  const name=document.getElementById('mo-name').value.trim();
-  const phone=document.getElementById('mo-phone').value.trim();
-  const email=document.getElementById('mo-email').value.trim();
-  const country=document.getElementById('mo-country').value;
-  const address=document.getElementById('mo-address').value.trim();
+  const name    = document.getElementById('mo-name').value.trim();
+  const phone   = document.getElementById('mo-phone').value.trim();
+  const email   = document.getElementById('mo-email').value.trim();
+  const country = document.getElementById('mo-country').value;
+  const address = document.getElementById('mo-address').value.trim();
   if(!name){tst('Please enter your name',true);document.getElementById('mo-name').focus();return}
   if(!phone){tst('Please enter your WhatsApp number',true);document.getElementById('mo-phone').focus();return}
-  const msg=[
-    `🎮 *NEW ORDER RECEIVED*`,`--------------------------`,
-    `*Account:* ${activeItem.title}`,
-    activeItem.tier?`*Tier:* ${activeItem.tier}`:null,
-    `*Price:* ${activeItem.price||'Contact for Price'}`,
-    activeItem.desc?`*Details:* ${activeItem.desc}`:null,
+  const msg = [
+    `🎮 *NEW ORDER RECEIVED*`,
     `--------------------------`,
-    `*Customer Name:* ${name}`,`*Phone:* ${phone}`,
-    email?`*Email:* ${email}`:null,
+    `*Account:* ${activeItem.title}`,
+    activeItem.tier ? `*Tier:* ${activeItem.tier}` : null,
+    `*Price:* ${activeItem.price||'Contact for Price'}`,
+    activeItem.desc ? `*Details:* ${activeItem.desc}` : null,
+    `--------------------------`,
+    `*Customer Name:* ${name}`,
+    `*Phone:* ${phone}`,
+    email   ? `*Email:* ${email}`     : null,
     `*Country:* ${country}`,
-    address?`*Address:* ${address}`:null,
+    address ? `*Address:* ${address}` : null,
     `--------------------------`,
     `Please confirm this order. Thank you! 🙏`
   ].filter(l=>l!==null).join('\n');
@@ -995,135 +629,28 @@ function submitOrder(){
 }
 
 // ═══════════════════════════════════════════════
-// PREMIUM HIGHLIGHT MODAL (NEW)
-// Shows a formatted breakdown from parsed item data
-// ═══════════════════════════════════════════════
-function showHighlight(firestoreId){
-  const item=stock.find(s=>s.firestoreId===firestoreId);
-  if(!item)return;
-  const tags=(item.tags||[]);
-  const tagHtml=tags.length
-    ?`<div class="hl-tags">${tags.map(t=>`<span class="hl-tag">${esc(t)}</span>`).join('')}</div>`
-    :'';
-  const mediaHtml=item.mediaUrl
-    ?(item.mediaType&&item.mediaType.startsWith('video/')
-        ?`<video src="${esc(item.mediaUrl)}" muted autoplay loop playsinline style="width:100%;border-radius:6px;margin-bottom:12px;aspect-ratio:4/3;object-fit:cover;background:#040810"></video>`
-        :`<img src="${esc(item.mediaUrl)}" alt="${esc(item.title)}" style="width:100%;border-radius:6px;margin-bottom:12px;aspect-ratio:4/3;object-fit:cover;background:#040810"/>`)
-    :(item.img
-        ?`<img src="${esc(item.img)}" alt="${esc(item.title)}" style="width:100%;border-radius:6px;margin-bottom:12px;aspect-ratio:4/3;object-fit:cover;background:#040810"/>`
-        :'');
-  document.getElementById('hl-body').innerHTML=`
-    ${mediaHtml}
-    <div class="hl-row"><span class="hl-key">Account</span><span class="hl-val cyan">${esc(item.title)}</span></div>
-    ${item.tier?`<div class="hl-row"><span class="hl-key">Tier</span><span class="hl-val">${esc(item.tier)}</span></div>`:''}
-    <div class="hl-row"><span class="hl-key">Price</span><span class="hl-val gold">${esc(item.price||'Contact for Price')}</span></div>
-    <div class="hl-row"><span class="hl-key">Status</span><span class="hl-val" style="color:${item.sold?'var(--red)':'var(--green)'}">${item.sold?'SOLD':'AVAILABLE'}</span></div>
-    ${item.desc?`<div class="hl-desc">${esc(item.desc)}</div>`:''}
-    ${tagHtml}
-    ${!item.sold?`<button class="hl-cta" onclick="closeModal();setTimeout(()=>window._openOrder('${item.firestoreId}'),100)">${WASVG} BUY THIS ACCOUNT</button>`:''}
-    <button class="hl-close" onclick="closeModal()">CLOSE</button>
-  `;
-  document.getElementById('hlModal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-// ═══════════════════════════════════════════════
-// SEARCH FILTER (NEW)
-// Real-time filtering by title, description, tags
-// ═══════════════════════════════════════════════
-function searchFilter(){
-  searchQ=document.getElementById('searchInp').value.toLowerCase().trim();
-  renderPub();
-}
-
-// ═══════════════════════════════════════════════
-// TAG FILTERS (NEW)
-// Dynamically generate filter buttons from all tags in stock
-// ═══════════════════════════════════════════════
-function renderTagFilters(){
-  const allTags=new Set();
-  stock.forEach(item=>{(item.tags||[]).forEach(t=>allTags.add(t.trim()))});
-  const container=document.getElementById('ftabs');
-  // Remove any previously added tag buttons (preserve first 3: ALL, AVAILABLE, SOLD)
-  const existing=Array.from(container.querySelectorAll('.ft'));
-  existing.slice(3).forEach(el=>el.remove());
-  // Add one button per unique tag
-  allTags.forEach(tag=>{
-    if(!tag)return;
-    const btn=document.createElement('div');
-    btn.className='ft';
-    btn.textContent=tag.toUpperCase();
-    btn.onclick=function(){filt('tag:'+tag,this)};
-    container.appendChild(btn);
-  });
-}
-
-// ═══════════════════════════════════════════════
 // PUBLIC RENDER
 // ═══════════════════════════════════════════════
 function renderPub(){
-  renderTagFilters();
   const g=document.getElementById('sgrid');
   let items=stock;
-  // Apply status filter
   if(cf==='available')items=stock.filter(s=>!s.sold);
-  else if(cf==='sold')items=stock.filter(s=>s.sold);
-  else if(cf.startsWith('tag:')){
-    const tagFilter=cf.slice(4).toLowerCase();
-    items=stock.filter(s=>(s.tags||[]).some(t=>t.toLowerCase()===tagFilter));
-  }
-  // Apply search query on top of status/tag filter
-  if(searchQ){
-    items=items.filter(s=>{
-      const haystack=[s.title,s.desc,s.tier,...(s.tags||[])].join(' ').toLowerCase();
-      return haystack.includes(searchQ);
-    });
-  }
+  if(cf==='sold')items=stock.filter(s=>s.sold);
   if(!items.length){
-    g.innerHTML=`<div class="empty"><div class="ei">🎮</div><h3>${searchQ?'NO RESULTS FOUND':cf!=='all'?'NO ACCOUNTS IN THIS CATEGORY':'NO STOCK LISTED YET'}</h3><p>${searchQ?'Try a different search term.':'New drops regularly. Ask us on WhatsApp!'}</p><a class="btn bwa" href="https://wa.me/${WA}" target="_blank" style="display:inline-flex">${WASVG} Check via WhatsApp</a></div>`;
+    g.innerHTML=`<div class="empty"><div class="ei">🎮</div><h3>${cf!=='all'?'NO ACCOUNTS IN THIS CATEGORY':'NO STOCK LISTED YET'}</h3><p>New drops regularly. Ask us on WhatsApp!</p><a class="btn bwa" href="https://wa.me/${WA}" target="_blank" style="display:inline-flex">${WASVG} Check via WhatsApp</a></div>`;
     return;
   }
   g.innerHTML=items.map(item=>{
-    const fid=item.firestoreId;
-    // Dynamic media: render <video> or <img> based on stored mediaType
-    let mediaHtml;
-    if(item.mediaUrl){
-      if(item.mediaType&&item.mediaType.startsWith('video/')){
-        mediaHtml=`<video class="cv" src="${esc(item.mediaUrl)}" muted autoplay loop playsinline></video>`;
-      }else{
-        mediaHtml=`<img class="ci" src="${esc(item.mediaUrl)}" alt="${esc(item.title)}" loading="lazy"/>`;
-      }
-    }else if(item.img){
-      // Backward compat: old base64 images still render
-      mediaHtml=`<img class="ci" src="${esc(item.img)}" alt="${esc(item.title)}" loading="lazy"/>`;
-    }else{
-      mediaHtml=`<div class="cip">🎮</div>`;
-    }
+    const img=item.img?`<img class="ci" src="${item.img}" alt="${esc(item.title)}" loading="lazy"/>`:`<div class="cip">🎮</div>`;
     const badge=item.sold?`<div class="sbadge sold-b">SOLD</div>`:`<div class="sbadge live-b">LIVE</div>`;
     const tr=item.tier?`<div class="trib ${tc(item.tier)}">${esc(item.tier)}</div>`:'';
     const pr=item.price?`<div class="cprice">${esc(item.price)}</div>`:`<div class="cprice fp">Contact for Price</div>`;
+    const fid=item.firestoreId;
     const cta=!item.sold?`<button class="ccta" onclick="window._openOrder('${fid}')">${WASVG} Buy Now</button>`:'';
-    const tagsHtml=(item.tags||[]).length
-      ?`<div class="ctags">${(item.tags).slice(0,3).map(t=>`<span class="ctag">${esc(t)}</span>`).join('')}</div>`:'';
-    return `<div class="sc${item.sold?' sold':''}">
-      <div class="ciw">${mediaHtml}${badge}${tr}</div>
-      <div class="cb">
-        <div class="ctitle">${esc(item.title)}</div>
-        ${item.desc?`<div class="cdesc">${esc(item.desc)}</div>`:''}
-        ${tagsHtml}
-        <div class="cf">${pr}${cta}</div>
-        <button class="chl" onclick="window._showHighlight('${fid}')">⭐ Premium Highlight</button>
-      </div>
-    </div>`;
+    return `<div class="sc${item.sold?' sold':''}"><div class="ciw">${img}${badge}${tr}</div><div class="cb"><div class="ctitle">${esc(item.title)}</div>${item.desc?`<div class="cdesc">${esc(item.desc)}</div>`:''}<div class="cf">${pr}${cta}</div></div></div>`;
   }).join('');
 }
-
-function filt(f,el){
-  cf=f;
-  document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));
-  if(el)el.classList.add('on');
-  renderPub();
-}
+function filt(f,el){cf=f;document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderPub()}
 
 // ═══════════════════════════════════════════════
 // ADMIN RENDER
@@ -1138,36 +665,13 @@ function renderAdm(){
   if(!stock.length){g.innerHTML='';em.style.display='block';return}
   em.style.display='none';
   g.innerHTML=[...stock].reverse().map(item=>{
-    const fid=item.firestoreId;
-    // Render video thumbnail or image in admin grid
-    let thumbHtml;
-    if(item.mediaUrl){
-      if(item.mediaType&&item.mediaType.startsWith('video/')){
-        thumbHtml=`<video src="${esc(item.mediaUrl)}" muted playsinline style="width:100%;aspect-ratio:1;object-fit:contain;background:#040810;display:block"></video>`;
-      }else{
-        thumbHtml=`<img src="${esc(item.mediaUrl)}" alt="${esc(item.title)}"/>`;
-      }
-    }else if(item.img){
-      thumbHtml=`<img src="${esc(item.img)}" alt="${esc(item.title)}"/>`;
-    }else{
-      thumbHtml=`<div class="ano">🎮</div>`;
-    }
+    const img=item.img?`<img src="${item.img}" alt="${esc(item.title)}"/>`:`<div class="ano">🎮</div>`;
     const sc=item.sold?`<div class="asc">SOLD</div>`:'';
+    const fid=item.firestoreId;
     const tb=item.sold
       ?`<button class="ba bma" onclick="window._tgSold('${fid}')">✅ Available</button>`
       :`<button class="ba bms" onclick="window._tgSold('${fid}')">🔴 Sold</button>`;
-    return `<div class="adc">
-      <div style="position:relative">${thumbHtml}${sc}</div>
-      <div class="adcb">
-        <div class="adn" title="${esc(item.title)}">${esc(item.title)}</div>
-        <div class="adprice">${item.price?esc(item.price):'No price'}${item.tier?' · '+esc(item.tier):''}</div>
-        <div class="ada">
-          ${tb}
-          <button class="ba bedt" onclick="window._editItem('${fid}')">✏️ Edit</button>
-          <button class="ba bdl" onclick="window._dlItem('${fid}')">🗑</button>
-        </div>
-      </div>
-    </div>`;
+    return `<div class="adc"><div style="position:relative">${img}${sc}</div><div class="adcb"><div class="adn" title="${esc(item.title)}">${esc(item.title)}</div><div class="adprice">${item.price?esc(item.price):'No price'}${item.tier?' · '+esc(item.tier):''}</div><div class="ada">${tb}<button class="ba bdl" onclick="window._dlItem('${fid}')">🗑</button></div></div></div>`;
   }).join('');
 }
 
@@ -1203,250 +707,79 @@ async function clrAll(){
 }
 
 // ═══════════════════════════════════════════════
-// EDIT ITEM (NEW)
-// Populates the admin form with an existing item's data
-// so the admin can modify and save back to Firebase.
+// IMAGE UPLOAD
 // ═══════════════════════════════════════════════
-function editItem(firestoreId){
-  const item=stock.find(s=>s.firestoreId===firestoreId);
-  if(!item)return;
-  editId=firestoreId;
-  // Populate form fields
-  document.getElementById('f1').value=item.title||'';
-  document.getElementById('f2').value=item.desc||'';
-  document.getElementById('f3').value=item.price||'';
-  document.getElementById('f7').checked=item.sold||false;
-  // Set tier dropdown — add the value if it's not in options yet
-  selectedTier = item.tier||'';
-  if(selectedTier && !tierOptions.includes(selectedTier)) tierOptions.push(selectedTier);
-  buildDropdown('tier');
-  // Set tags dropdown — add any unknown tags to options
-  selectedTags = (item.tags||[]);
-  selectedTags.forEach(t=>{ if(!tagOptions.includes(t)) tagOptions.push(t); });
-  buildDropdown('tags');
-  // Update form title and button
-  document.getElementById('formTitle').textContent='✏️ EDIT STOCK ITEM';
-  document.getElementById('uplBtn').innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> SAVE CHANGES';
-  document.getElementById('cancBtn').classList.add('vis');
-  // Show current media preview if available
-  const ip=document.getElementById('ip'),vp=document.getElementById('vp');
-  ip.style.display='none';vp.style.display='none';
-  if(item.mediaUrl){
-    if(item.mediaType&&item.mediaType.startsWith('video/')){vp.src=item.mediaUrl;vp.style.display='block';}
-    else{ip.src=item.mediaUrl;ip.style.display='block';}
-  }else if(item.img){ip.src=item.img;ip.style.display='block';}
-  mediaFile=null; // reset pending upload
-  // Scroll to top of admin form
-  document.querySelector('.ap').scrollIntoView({behavior:'smooth',block:'start'});
-  tst('ℹ️ Editing: '+item.title);
+function prvImg(inp){
+  const f=inp.files[0];if(!f)return;
+  // Warn if file is very large
+  if(f.size > 900000) tst('⚠️ Image is large (>900KB). Consider compressing it for faster uploads.',true);
+  const r=new FileReader();
+  r.onload=ev=>{b64=ev.target.result;const p=document.getElementById('ip');p.src=b64;p.style.display='block'};
+  r.readAsDataURL(f);
 }
 
-function cancelEdit(){
-  editId=null;mediaFile=null;
-  clearAdminForm();
-  document.getElementById('formTitle').textContent='📦 ADD NEW STOCK';
-  document.getElementById('uplBtn').innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg> ADD TO STOCK';
-  document.getElementById('cancBtn').classList.remove('vis');
-  tst('Edit cancelled');
-}
-
-// ═══════════════════════════════════════════════
-// MEDIA PREVIEW (images + videos — NEW)
-// ═══════════════════════════════════════════════
-function prvMedia(inp){
-  const f=inp.files[0];
-  if(!f)return;
-  mediaFile=f; // store for upload
-  const ip=document.getElementById('ip'),vp=document.getElementById('vp');
-  ip.style.display='none';vp.style.display='none';
-  if(f.type.startsWith('video/')){
-    vp.src=URL.createObjectURL(f);
-    vp.style.display='block';
-  }else{
-    const r=new FileReader();
-    r.onload=ev=>{ip.src=ev.target.result;ip.style.display='block'};
-    r.readAsDataURL(f);
-  }
-}
-
-// ═══════════════════════════════════════════════
-// UPLOAD MEDIA TO FIREBASE STORAGE
-// Uses uploadBytesResumable for live progress bar.
-// The complete callback uses .then/.catch (NOT async/await)
-// so any getDownloadURL error always calls reject() and
-// surfaces in the outer try/catch — never swallowed silently.
-// ═══════════════════════════════════════════════
-function uploadMediaToStorage(file){
-  return new Promise((resolve,reject)=>{
-    const ext  = file.name.split('.').pop();
-    const path = `stock/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    const sRef = ref(storage, path);
-    const task = uploadBytesResumable(sRef, file);
-    const wrap  = document.getElementById('upbarWrap');
-    const fill  = document.getElementById('upbarFill');
-    const label = document.getElementById('upbarLabel');
-    wrap.classList.add('vis');
-    task.on('state_changed',
-      // Progress
-      (snap)=>{
-        const pct = snap.totalBytes
-          ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
-          : 0;
-        fill.style.width  = pct + '%';
-        label.textContent = 'Uploading... ' + pct + '%';
-      },
-      // Error — always surfaces here, passed to reject()
-      (err)=>{
-        wrap.classList.remove('vis');
-        reject(new Error(err.message || err.code || 'Storage upload failed'));
-      },
-      // Complete — .then/.catch so getDownloadURL errors reach reject()
-      ()=>{
-        fill.style.width  = '100%';
-        label.textContent = 'Upload complete ✓';
-        getDownloadURL(task.snapshot.ref)
-          .then(url=>{
-            setTimeout(()=>{ wrap.classList.remove('vis'); fill.style.width='0%'; }, 2000);
-            resolve({ url, type: file.type });
-          })
-          .catch(dlErr=>{
-            wrap.classList.remove('vis');
-            reject(new Error('getDownloadURL failed: ' + (dlErr.message || dlErr.code)));
-          });
-      }
-    );
-  });
-}
-
-// ═══════════════════════════════════════════════
-// SAVE / UPDATE STOCK
-// Handles both ADD (new doc) and EDIT (update doc).
-// ═══════════════════════════════════════════════
 async function upStock(){
   const t=document.getElementById('f1').value.trim();
   if(!t){tst('Please enter a title',true);document.getElementById('f1').focus();return}
   const btn=document.getElementById('uplBtn');
-  btn.disabled=true;
-  btn.textContent=editId?'SAVING CHANGES...':'SAVING TO FIREBASE...';
+  btn.disabled=true;btn.textContent='SAVING TO FIREBASE...';
   try{
-    // Upload new media file if one was selected
-    let mediaUrl=null,mediaType=null;
-    if(mediaFile){
-      const result=await uploadMediaToStorage(mediaFile);
-      mediaUrl=result.url;
-      mediaType=result.type;
-    }
-    // Read tier and tags from dropdown state (not DOM inputs)
-    const tags = [...selectedTags];
-    const tier = selectedTier;
-    if(editId){
-      // ── UPDATE existing document ──
-      const updates={
-        title:t,
-        desc:document.getElementById('f2').value.trim(),
-        price:document.getElementById('f3').value.trim(),
-        tier,
-        sold:document.getElementById('f7').checked,
-        tags,
-        updatedAt:new Date().toISOString()
-      };
-      // Only update media fields if a new file was uploaded
-      if(mediaUrl){updates.mediaUrl=mediaUrl;updates.mediaType=mediaType;}
-      await updateDoc(doc(db,COL,editId),updates);
-      tst('✅ Item updated in Firebase!');
-      cancelEdit();
-    }else{
-      // ── ADD new document ──
-      const item={
-        title:t,
-        desc:document.getElementById('f2').value.trim(),
-        price:document.getElementById('f3').value.trim(),
-        tier,
-        sold:document.getElementById('f7').checked,
-        tags,
-        mediaUrl,
-        mediaType,
-        img:null,
-        addedAt:new Date().toISOString()
-      };
-      await addDoc(collection(db,COL),item);
-      tst('✅ Account saved to Firebase! Visible to all customers instantly.');
-      clearAdminForm();
-    }
+    const item={
+      title:t,
+      desc:document.getElementById('f2').value.trim(),
+      price:document.getElementById('f3').value.trim(),
+      tier:document.getElementById('f4').value,
+      sold:document.getElementById('f7').checked,
+      img:b64||null,
+      addedAt:new Date().toISOString()
+    };
+    await addDoc(collection(db,COL),item);
+    // Clear form
+    ['f1','f2','f3'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f4').value='';
+    document.getElementById('f5').value='';
+    document.getElementById('f7').checked=false;
+    document.getElementById('ip').style.display='none';
+    b64=null;
+    tst('✅ Account saved to Firebase! Visible to all customers instantly.');
     document.getElementById('f1').focus();
   }catch(err){
-    // Always log to console AND show toast so nothing is silently swallowed
-    const msg = err?.message || err?.code || String(err) || 'Unknown error';
-    console.error('upStock error:', err);
-    tst('Error: ' + msg, true);
+    tst('Firebase error: '+err.message,true);
   }finally{
     btn.disabled=false;
-    // Re-read editId here because cancelEdit() may have cleared it
-    const stillEditing = !!document.getElementById('cancBtn').classList.contains('vis');
-    if(!stillEditing){
-      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg> ADD TO STOCK';
-    }else{
-      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> SAVE CHANGES';
-    }
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg> ADD TO STOCK';
   }
-}
-
-// Clears all form fields and resets media preview
-function clearAdminForm(){
-  ['f1','f2','f3'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f5').value='';
-  document.getElementById('f7').checked=false;
-  document.getElementById('ip').style.display='none';
-  document.getElementById('vp').style.display='none';
-  document.getElementById('vp').src='';
-  mediaFile=null;
-  // Reset dropdown selections
-  selectedTier='';
-  selectedTags=[];
-  buildDropdown('tier');
-  buildDropdown('tags');
 }
 
 // ═══════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
 function tst(msg,er=false){
   const t=document.getElementById('tst');t.textContent=msg;
   t.className='toast'+(er?' er':(msg.includes('✅')?' ok':''));
   t.classList.add('sh');setTimeout(()=>t.classList.remove('sh'),3500);
 }
-
-function tFaq(item){
-  const o=item.classList.contains('op');
-  document.querySelectorAll('.fi').forEach(i=>i.classList.remove('op'));
-  if(!o)item.classList.add('op');
-}
+function tFaq(item){const o=item.classList.contains('op');document.querySelectorAll('.fi').forEach(i=>i.classList.remove('op'));if(!o)item.classList.add('op')}
 
 // ═══════════════════════════════════════════════
 // EXPOSE functions to inline onclick handlers
+// (needed because this is a module script)
 // ═══════════════════════════════════════════════
-window._openOrder    = openOrder;
-window._tgSold       = tgSold;
-window._dlItem       = dlItem;
-window._editItem     = editItem;
-window._showHighlight= showHighlight;
-window.openOrder     = openOrder;
-window.closeModal    = closeModal;
-window.submitOrder   = submitOrder;
-window.doLogin       = doLogin;
-window.doLogout      = doLogout;
-window.showPublic    = showPublic;
-window.upStock       = upStock;
-window.prvMedia      = prvMedia;
-window.filt          = filt;
-window.tFaq          = tFaq;
-window.clrAll        = clrAll;
-window.cancelEdit    = cancelEdit;
-window.searchFilter  = searchFilter;
-window.toggleDropdown   = toggleDropdown;
-window.addDropdownItem  = addDropdownItem;
+window._openOrder = openOrder;
+window._tgSold    = tgSold;
+window._dlItem    = dlItem;
+window.openOrder  = openOrder;
+window.closeModal = closeModal;
+window.submitOrder= submitOrder;
+window.doLogin    = doLogin;
+window.doLogout   = doLogout;
+window.showPublic = showPublic;
+window.upStock    = upStock;
+window.prvImg     = prvImg;
+window.filt       = filt;
+window.tFaq       = tFaq;
+window.clrAll     = clrAll;
 
 // ═══════════════════════════════════════════════
 // ROUTER + INIT
@@ -1458,18 +791,21 @@ function onHash(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('fy').textContent=new Date().getFullYear();
-  // Build both checkbox dropdowns with default options
-  buildDropdown('tier');
-  buildDropdown('tags');
+  // Start Firebase real-time listener
   startLiveListener();
-  // Hide loading screen after first snapshot or 4s fallback
+  // Hide loading screen after first data load (max 4s fallback)
   const hideTimer=setTimeout(()=>{hideLoading();onHash();},4000);
+  const origStart=startLiveListener;
+  // Override to hide loading on first successful snapshot
   const q2=query(collection(db,COL),orderBy("addedAt","asc"));
   const unsub2=onSnapshot(q2,()=>{
-    clearTimeout(hideTimer);hideLoading();onHash();unsub2();
+    clearTimeout(hideTimer);
+    hideLoading();
+    onHash();
+    unsub2(); // only need this once for initial load
   },(err)=>{clearTimeout(hideTimer);hideLoading();onHash();unsub2()});
 
-  // Drag-drop upload zone — now accepts image + video
+  // Drag-drop image upload
   const uz=document.getElementById('uz');
   if(uz){
     uz.addEventListener('dragover',ev=>{ev.preventDefault();uz.classList.add('ov')});
@@ -1477,15 +813,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     uz.addEventListener('drop',ev=>{
       ev.preventDefault();uz.classList.remove('ov');
       const f=ev.dataTransfer.files[0];
-      if(f&&(f.type.startsWith('image/')||f.type.startsWith('video/'))){
-        const inp=document.getElementById('f5');
-        const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;
-        prvMedia(inp);
-      }
+      if(f&&f.type.startsWith('image/')){const i=document.getElementById('f5');const dt=new DataTransfer();dt.items.add(f);i.files=dt.files;prvImg(i)}
     });
   }
 });
-
 window.addEventListener('hashchange',onHash);
 </script>
 </body>
