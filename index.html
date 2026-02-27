@@ -272,12 +272,32 @@ footer a:hover{color:var(--cyan)}
 .fta{resize:vertical;min-height:72px;line-height:1.5}
 .fse option{background:var(--bg2)}
 
-/* NEW: Smart Format button row */
-.desc-row{display:flex;align-items:flex-start;gap:8px}
-.desc-row .fta{flex:1}
-.smart-btn{padding:7px 11px;background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(79,143,255,0.12));border:1px solid rgba(0,212,255,0.3);border-radius:5px;color:var(--cyan);font-size:.62rem;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:.8px;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;margin-top:0;line-height:1.3}
-.smart-btn:hover{background:rgba(0,212,255,0.18);box-shadow:0 2px 10px rgba(0,212,255,0.15)}
-.smart-btn:disabled{opacity:.4;cursor:not-allowed}
+/* ── CHECKBOX DROPDOWN ─────────────────────────── */
+/* Shared component used for both Tier and Tags fields */
+.chkdrop{position:relative;width:100%}
+/* Trigger button — shows selected values or placeholder */
+.chkdrop-btn{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:9px 32px 9px 11px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.86rem;text-align:left;cursor:pointer;transition:border .2s;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chkdrop-btn:focus,.chkdrop-btn.open{border-color:var(--blue);box-shadow:0 0 0 2px rgba(79,143,255,0.07)}
+.chkdrop-btn .arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);transition:transform .2s;color:var(--muted);pointer-events:none;font-size:.7rem}
+.chkdrop-btn.open .arrow{transform:translateY(-50%) rotate(180deg)}
+.chkdrop-btn .placeholder{color:rgba(90,116,148,.55)}
+/* The dropdown panel */
+.chkdrop-panel{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;z-index:400;box-shadow:0 8px 28px rgba(0,0,0,.55);max-height:220px;overflow-y:auto;display:none}
+.chkdrop-panel.open{display:block}
+.chkdrop-panel::-webkit-scrollbar{width:3px}
+.chkdrop-panel::-webkit-scrollbar-thumb{background:var(--blue2);border-radius:3px}
+/* Each checkbox row in the panel */
+.chkdrop-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;transition:background .15s;user-select:none}
+.chkdrop-item:hover{background:rgba(79,143,255,0.07)}
+.chkdrop-item input[type=checkbox],.chkdrop-item input[type=radio]{width:14px;height:14px;accent-color:var(--blue);flex-shrink:0;cursor:pointer}
+.chkdrop-item span{font-family:'Exo 2',sans-serif;font-size:.84rem;color:var(--text)}
+/* Divider + "Add new" row at the bottom */
+.chkdrop-add{border-top:1px solid var(--border);padding:8px 10px;display:flex;gap:6px}
+.chkdrop-add input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:6px 9px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.8rem;outline:none;transition:border .2s}
+.chkdrop-add input:focus{border-color:var(--blue)}
+.chkdrop-add input::placeholder{color:rgba(90,116,148,.5)}
+.chkdrop-add button{background:rgba(79,143,255,0.1);border:1px solid rgba(79,143,255,0.25);color:var(--blue);border-radius:4px;padding:5px 10px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace;white-space:nowrap;transition:all .2s}
+.chkdrop-add button:hover{background:rgba(79,143,255,0.2)}
 
 /* Upload zone */
 .uz{border:2px dashed rgba(79,143,255,0.18);border-radius:6px;padding:24px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:rgba(79,143,255,0.015)}
@@ -556,38 +576,52 @@ footer a:hover{color:var(--cyan)}
         <input class="fi2" id="f1" type="text" placeholder="e.g. Conqueror Account – Poseidon X-Suit"/>
       </div>
 
-      <!-- Description + Smart Format button -->
+      <!-- Description — plain textarea -->
       <div class="fg">
         <label class="fl">Description</label>
-        <div class="desc-row">
-          <textarea class="fta" id="f2" placeholder="Paste messy notes here, then click Smart Format..."></textarea>
-          <button class="smart-btn" id="smartBtn" onclick="smartFormat()" title="Auto-standardize description, extract tags & price">✦ SMART<br/>FORMAT</button>
-        </div>
+        <textarea class="fta" id="f2" placeholder="Describe the account — skins, rank, weapons, special items..."></textarea>
       </div>
 
       <!-- Price -->
       <div class="fg">
         <label class="fl">Price</label>
-        <input class="fi2" id="f3" type="text" placeholder="e.g. $1,500.00 or Contact for Price"/>
+        <input class="fi2" id="f3" type="text" placeholder="e.g. ₹15,000 or Contact for Price"/>
       </div>
 
-      <!-- Tags (NEW - populated by Smart Format or manual entry) -->
-      <div class="fg">
-        <label class="fl">Tags <span style="color:var(--muted);font-size:.6rem;font-family:'Exo 2',sans-serif;font-weight:400;text-transform:none;letter-spacing:0">(comma-separated, auto-filled by Smart Format)</span></label>
-        <input class="fi2" id="f8" type="text" placeholder="e.g. X-Suit, Mythic, Lamborghini, Conqueror"/>
-      </div>
-
-      <!-- Tier / Category -->
+      <!-- Tier — single-select checkbox dropdown -->
       <div class="fg">
         <label class="fl">Tier / Category</label>
-        <select class="fse" id="f4">
-          <option value="">— Select tier (optional) —</option>
-          <option value="Bronze">Bronze Tier</option><option value="Silver">Silver Tier</option>
-          <option value="Gold">Gold Tier</option><option value="Platinum">Platinum Tier</option>
-          <option value="Diamond">Diamond Tier</option><option value="Crown">Crown Tier</option>
-          <option value="Ace">Ace Tier</option><option value="Conqueror">Conqueror Tier</option>
-          <option value="X-Suit">X-Suit Account</option>
-        </select>
+        <div class="chkdrop" id="tierDrop">
+          <button type="button" class="chkdrop-btn" id="tierBtn" onclick="toggleDropdown('tier')">
+            <span class="placeholder" id="tierLabel">— Select a tier —</span>
+            <span class="arrow">▼</span>
+          </button>
+          <div class="chkdrop-panel" id="tierPanel">
+            <!-- Radio items built by JS -->
+            <div class="chkdrop-add">
+              <input type="text" id="tierNewInp" placeholder="Add new tier..." onkeydown="if(event.key==='Enter'){event.preventDefault();addDropdownItem('tier')}"/>
+              <button onclick="addDropdownItem('tier')">+ ADD</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags — multi-select checkbox dropdown -->
+      <div class="fg">
+        <label class="fl">Tags</label>
+        <div class="chkdrop" id="tagsDrop">
+          <button type="button" class="chkdrop-btn" id="tagsBtn" onclick="toggleDropdown('tags')">
+            <span class="placeholder" id="tagsLabel">— Select tags —</span>
+            <span class="arrow">▼</span>
+          </button>
+          <div class="chkdrop-panel" id="tagsPanel">
+            <!-- Checkbox items built by JS -->
+            <div class="chkdrop-add">
+              <input type="text" id="tagsNewInp" placeholder="Add new tag..." onkeydown="if(event.key==='Enter'){event.preventDefault();addDropdownItem('tags')}"/>
+              <button onclick="addDropdownItem('tags')">+ ADD</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Media Upload (image + video, with progress bar) -->
@@ -694,6 +728,15 @@ let unsubscribe = null;
 let editId      = null;  // firestoreId of item being edited (null = add mode)
 let mediaFile   = null;  // currently selected File object for upload
 
+// ── Dropdown state ──────────────────────────────────
+// Tier: single-select (radio). Default options + any the admin adds.
+let tierOptions  = ['Bronze','Silver','Gold','Platinum','Diamond','Crown','Ace','Conqueror','X-Suit'];
+let selectedTier = '';   // single string
+
+// Tags: multi-select (checkboxes). Default options + any the admin adds.
+let tagOptions   = ['Mythic','Legendary','Glacier','Poseidon','Lamborghini','Ferrari','M416','AWM','UC','Season Pass','Elite Pass','X-Suit'];
+let selectedTags = [];   // array of strings
+
 // ═══════════════════════════════════════════════
 // PARTICLES
 // ═══════════════════════════════════════════════
@@ -712,8 +755,115 @@ let mediaFile   = null;  // currently selected File object for upload
 })();
 
 // ═══════════════════════════════════════════════
-// FIREBASE STATUS INDICATOR
+// CHECKBOX DROPDOWN — shared component
+// type = 'tier' (single-select/radio) or 'tags' (multi-select/checkbox)
 // ═══════════════════════════════════════════════
+
+/** Render all items inside a dropdown panel, inserting before the .chkdrop-add row */
+function buildDropdown(type){
+  const isTag  = type==='tags';
+  const opts   = isTag ? tagOptions   : tierOptions;
+  const panel  = document.getElementById(type+'Panel');
+  const addRow = panel.querySelector('.chkdrop-add');
+  // Remove previously rendered items (everything before the add row)
+  Array.from(panel.children).forEach(c=>{ if(c!==addRow) c.remove(); });
+  // Rebuild items
+  opts.forEach(opt=>{
+    const row = document.createElement('label');
+    row.className='chkdrop-item';
+    const inp = document.createElement('input');
+    inp.type  = isTag ? 'checkbox' : 'radio';
+    inp.name  = type+'Radio';
+    inp.value = opt;
+    if(isTag)  inp.checked = selectedTags.includes(opt);
+    else       inp.checked = selectedTier===opt;
+    inp.addEventListener('change',()=>{ onDropdownChange(type); });
+    const lbl = document.createElement('span');
+    lbl.textContent = opt;
+    row.appendChild(inp);
+    row.appendChild(lbl);
+    panel.insertBefore(row, addRow);
+  });
+  updateDropdownBtn(type);
+}
+
+/** Sync state arrays from DOM checkboxes/radios then refresh button label */
+function onDropdownChange(type){
+  const panel = document.getElementById(type+'Panel');
+  if(type==='tags'){
+    selectedTags = Array.from(panel.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+  }else{
+    const checked = panel.querySelector('input[type=radio]:checked');
+    selectedTier  = checked ? checked.value : '';
+  }
+  updateDropdownBtn(type);
+}
+
+/** Update the trigger button text to show what's selected */
+function updateDropdownBtn(type){
+  const lbl = document.getElementById(type+'Label');
+  const btn = document.getElementById(type+'Btn');
+  if(type==='tags'){
+    if(selectedTags.length){
+      lbl.textContent = selectedTags.join(', ');
+      lbl.classList.remove('placeholder');
+    }else{
+      lbl.textContent = '— Select tags —';
+      lbl.classList.add('placeholder');
+    }
+  }else{
+    if(selectedTier){
+      lbl.textContent = selectedTier;
+      lbl.classList.remove('placeholder');
+    }else{
+      lbl.textContent = '— Select a tier —';
+      lbl.classList.add('placeholder');
+    }
+  }
+}
+
+/** Open/close a dropdown panel */
+function toggleDropdown(type){
+  const panel = document.getElementById(type+'Panel');
+  const btn   = document.getElementById(type+'Btn');
+  const other = type==='tier' ? 'tags' : 'tier';
+  // Close the other dropdown if open
+  document.getElementById(other+'Panel').classList.remove('open');
+  document.getElementById(other+'Btn').classList.remove('open');
+  // Toggle this one
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+}
+
+/** Add a new option typed into the "Add new" input */
+function addDropdownItem(type){
+  const inp   = document.getElementById(type+'NewInp');
+  const val   = inp.value.trim();
+  if(!val) return;
+  const opts  = type==='tags' ? tagOptions : tierOptions;
+  if(opts.some(o=>o.toLowerCase()===val.toLowerCase())){
+    tst('Option already exists',true); return;
+  }
+  opts.push(val);
+  // Auto-select the newly added item
+  if(type==='tags')  selectedTags.push(val);
+  else               selectedTier = val;
+  inp.value = '';
+  buildDropdown(type);
+}
+
+/** Close all dropdowns when clicking outside them */
+document.addEventListener('click',e=>{
+  ['tier','tags'].forEach(type=>{
+    const wrap = document.getElementById(type+'Drop');
+    if(wrap && !wrap.contains(e.target)){
+      document.getElementById(type+'Panel').classList.remove('open');
+      document.getElementById(type+'Btn').classList.remove('open');
+    }
+  });
+});
+
+
 function setFbStatus(state){
   const el=document.getElementById('fb-indicator');
   const lb=document.getElementById('fb-label');
@@ -1061,9 +1211,15 @@ function editItem(firestoreId){
   document.getElementById('f1').value=item.title||'';
   document.getElementById('f2').value=item.desc||'';
   document.getElementById('f3').value=item.price||'';
-  document.getElementById('f4').value=item.tier||'';
   document.getElementById('f7').checked=item.sold||false;
-  document.getElementById('f8').value=(item.tags||[]).join(', ');
+  // Set tier dropdown — add the value if it's not in options yet
+  selectedTier = item.tier||'';
+  if(selectedTier && !tierOptions.includes(selectedTier)) tierOptions.push(selectedTier);
+  buildDropdown('tier');
+  // Set tags dropdown — add any unknown tags to options
+  selectedTags = (item.tags||[]);
+  selectedTags.forEach(t=>{ if(!tagOptions.includes(t)) tagOptions.push(t); });
+  buildDropdown('tags');
   // Update form title and button
   document.getElementById('formTitle').textContent='✏️ EDIT STOCK ITEM';
   document.getElementById('uplBtn').innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> SAVE CHANGES';
@@ -1163,17 +1319,16 @@ async function upStock(){
       mediaUrl=result.url;
       mediaType=result.type;
     }
-    // Parse tags from the tags field (comma-separated)
-    const tagsRaw=document.getElementById('f8').value;
-    const tags=tagsRaw.split(',').map(s=>s.trim()).filter(Boolean);
+    // Read tier and tags from dropdown state (not DOM inputs)
+    const tags = [...selectedTags];
+    const tier = selectedTier;
     if(editId){
       // ── UPDATE existing document ──
-      const existing=stock.find(s=>s.firestoreId===editId);
       const updates={
         title:t,
         desc:document.getElementById('f2').value.trim(),
         price:document.getElementById('f3').value.trim(),
-        tier:document.getElementById('f4').value,
+        tier,
         sold:document.getElementById('f7').checked,
         tags,
         updatedAt:new Date().toISOString()
@@ -1189,12 +1344,12 @@ async function upStock(){
         title:t,
         desc:document.getElementById('f2').value.trim(),
         price:document.getElementById('f3').value.trim(),
-        tier:document.getElementById('f4').value,
+        tier,
         sold:document.getElementById('f7').checked,
         tags,
         mediaUrl,
         mediaType,
-        img:null, // new items no longer use base64
+        img:null,
         addedAt:new Date().toISOString()
       };
       await addDoc(collection(db,COL),item);
@@ -1214,100 +1369,18 @@ async function upStock(){
 
 // Clears all form fields and resets media preview
 function clearAdminForm(){
-  ['f1','f2','f3','f8'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f4').value='';
+  ['f1','f2','f3'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f5').value='';
   document.getElementById('f7').checked=false;
   document.getElementById('ip').style.display='none';
   document.getElementById('vp').style.display='none';
   document.getElementById('vp').src='';
   mediaFile=null;
-}
-
-// ═══════════════════════════════════════════════
-// SMART FORMAT (NEW)
-// Analyzes pasted description text and:
-//   1. Standardizes it into professional format
-//   2. Extracts PUBG keywords as tags
-//   3. Detects and formats the price as USD
-// All processing is done client-side.
-// ═══════════════════════════════════════════════
-function smartFormat(){
-  const btn=document.getElementById('smartBtn');
-  const raw=document.getElementById('f2').value.trim();
-  if(!raw){tst('Paste a description first',true);return}
-  btn.disabled=true;btn.textContent='PARSING...';
-  try{
-    // ── 1. STANDARDIZE DESCRIPTION ──
-    // Capitalize first letter of each sentence, clean up spacing
-    let desc=raw
-      .replace(/\s{2,}/g,' ')            // collapse multiple spaces
-      .replace(/([.!?])\s*([a-z])/g,(_,p,q)=>p+' '+q.toUpperCase()) // cap after sentence end
-      .replace(/^(.)/,m=>m.toUpperCase()) // cap start
-      .trim();
-    // Ensure it ends with a period if it doesn't
-    if(!/[.!?]$/.test(desc))desc+='.';
-    document.getElementById('f2').value=desc;
-
-    // ── 2. EXTRACT PRICE ──
-    // Look for price patterns: $X,XXX | ₹X,XXX | Xk | X000
-    const pricePatterns=[
-      /\$\s?(\d[\d,]+(?:\.\d{1,2})?)/i,  // $1,000 or $1000
-      /₹\s?(\d[\d,]+(?:\.\d{1,2})?)/i,   // ₹15,000
-      /USD\s?(\d[\d,]+(?:\.\d{1,2})?)/i,  // USD 1000
-      /(\d+)\s*k\b/i,                      // 15k → 15000
-      /(\d[\d,]{2,})\s*(?:rs|rupees|inr)?/i // plain large number
-    ];
-    let extractedPrice=null;
-    for(const pat of pricePatterns){
-      const m=raw.match(pat);
-      if(m){
-        let num=parseFloat(m[1].replace(/,/g,''));
-        // Handle "k" multiplier
-        if(pat.toString().includes('\\s*k'))num*=1000;
-        // Convert INR to USD rough estimate if using rupee sign (÷84)
-        if(pat.toString().includes('₹')||pat.toString().includes('rs|rupees|inr'))num=Math.round(num/84);
-        extractedPrice=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(num);
-        break;
-      }
-    }
-    if(extractedPrice&&!document.getElementById('f3').value.trim()){
-      document.getElementById('f3').value=extractedPrice;
-    }
-
-    // ── 3. EXTRACT TAGS ──
-    // Check for known PUBG keywords and any capitalized proper nouns
-    const KNOWN_TAGS=[
-      'X-Suit','Mythic','Legendary','Conqueror','Ace','Diamond','Crown','Platinum',
-      'Glacier','Poseidon','Lamborghini','Ferrari','Bugatti','McLaren',
-      'M416','AKM','M762','Groza','AWM','Kar98','DP-28','UZI','Mini14',
-      'Kar98k','Scar-L','Beryl','MG3','DP28',
-      'UC','Unknown Cash','Season Pass','Elite Pass',
-      'Classic Crate','Premium Crate','Ancient Secret','Toy Playground',
-      'Runic Power','Space Lab','Metro Royale','Payload','TDM',
-      'Season','Chicken Medal','Ace Master','Ace Dominator'
-    ];
-    const foundTags=new Set();
-    const rawUpper=raw;
-    KNOWN_TAGS.forEach(kw=>{
-      const re=new RegExp('\\b'+kw.replace('-','[-\\s]?')+'\\b','i');
-      if(re.test(rawUpper))foundTags.add(kw);
-    });
-    // Also capture any ALL-CAPS words 3+ chars as potential keywords
-    const capsWords=rawUpper.match(/\b[A-Z]{3,}\b/g)||[];
-    capsWords.forEach(w=>{if(!['THE','AND','FOR','WITH','HAS','THIS','FROM','THAT','ARE','HAVE'].includes(w))foundTags.add(w.charAt(0)+w.slice(1).toLowerCase())});
-    // Merge with existing tags
-    const existingTags=document.getElementById('f8').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const merged=[...new Set([...existingTags,...foundTags])];
-    document.getElementById('f8').value=merged.join(', ');
-
-    tst('✅ Smart Format applied! Description cleaned, tags + price extracted.');
-  }catch(err){
-    tst('Smart Format error: '+err.message,true);
-  }finally{
-    btn.disabled=false;btn.textContent='✦ SMART\nFORMAT';
-    btn.innerHTML='✦ SMART<br/>FORMAT';
-  }
+  // Reset dropdown selections
+  selectedTier='';
+  selectedTags=[];
+  buildDropdown('tier');
+  buildDropdown('tags');
 }
 
 // ═══════════════════════════════════════════════
@@ -1346,9 +1419,10 @@ window.prvMedia      = prvMedia;
 window.filt          = filt;
 window.tFaq          = tFaq;
 window.clrAll        = clrAll;
-window.smartFormat   = smartFormat;
 window.cancelEdit    = cancelEdit;
 window.searchFilter  = searchFilter;
+window.toggleDropdown   = toggleDropdown;
+window.addDropdownItem  = addDropdownItem;
 
 // ═══════════════════════════════════════════════
 // ROUTER + INIT
@@ -1360,6 +1434,9 @@ function onHash(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('fy').textContent=new Date().getFullYear();
+  // Build both checkbox dropdowns with default options
+  buildDropdown('tier');
+  buildDropdown('tags');
   startLiveListener();
   // Hide loading screen after first snapshot or 4s fallback
   const hideTimer=setTimeout(()=>{hideLoading();onHash();},4000);
