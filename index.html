@@ -569,6 +569,10 @@ footer a:hover{color:var(--cyan)}
         <span>🔥</span>
         <span><b>Firebase Connected</b> — Stock saves instantly to the cloud. Every customer on every device sees your stock in real time.</span>
       </div>
+      <div class="fb-note" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.04)">
+        <span>⚠️</span>
+        <span style="color:#c8a800"><b>Storage Rules:</b> If uploads fail, open Firebase Console → Storage → Rules and set: <code style="background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;font-size:.72rem">allow read, write: if true;</code> to allow unauthenticated uploads.</span>
+      </div>
 
       <!-- Title -->
       <div class="fg">
@@ -1266,36 +1270,49 @@ function prvMedia(inp){
 }
 
 // ═══════════════════════════════════════════════
-// UPLOAD MEDIA TO FIREBASE STORAGE (NEW)
-// Uses uploadBytesResumable so progress bar updates live.
-// Returns { url, type } on success, or null if no file.
+// UPLOAD MEDIA TO FIREBASE STORAGE
+// Uses uploadBytesResumable for live progress bar.
+// The complete callback uses .then/.catch (NOT async/await)
+// so any getDownloadURL error always calls reject() and
+// surfaces in the outer try/catch — never swallowed silently.
 // ═══════════════════════════════════════════════
-async function uploadMediaToStorage(file){
+function uploadMediaToStorage(file){
   return new Promise((resolve,reject)=>{
-    const ext=file.name.split('.').pop();
-    const path=`stock/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    const storageRef=ref(storage,path);
-    const task=uploadBytesResumable(storageRef,file);
-    const wrap=document.getElementById('upbarWrap');
-    const fill=document.getElementById('upbarFill');
-    const label=document.getElementById('upbarLabel');
+    const ext  = file.name.split('.').pop();
+    const path = `stock/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const sRef = ref(storage, path);
+    const task = uploadBytesResumable(sRef, file);
+    const wrap  = document.getElementById('upbarWrap');
+    const fill  = document.getElementById('upbarFill');
+    const label = document.getElementById('upbarLabel');
     wrap.classList.add('vis');
     task.on('state_changed',
+      // Progress
       (snap)=>{
-        const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
-        fill.style.width=pct+'%';
-        label.textContent=`Uploading... ${pct}%`;
+        const pct = snap.totalBytes
+          ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
+          : 0;
+        fill.style.width  = pct + '%';
+        label.textContent = 'Uploading... ' + pct + '%';
       },
+      // Error — always surfaces here, passed to reject()
       (err)=>{
         wrap.classList.remove('vis');
-        reject(err);
+        reject(new Error(err.message || err.code || 'Storage upload failed'));
       },
-      async()=>{
-        const url=await getDownloadURL(task.snapshot.ref);
-        fill.style.width='100%';
-        label.textContent='Upload complete ✓';
-        setTimeout(()=>{wrap.classList.remove('vis');fill.style.width='0%'},2000);
-        resolve({url,type:file.type});
+      // Complete — .then/.catch so getDownloadURL errors reach reject()
+      ()=>{
+        fill.style.width  = '100%';
+        label.textContent = 'Upload complete ✓';
+        getDownloadURL(task.snapshot.ref)
+          .then(url=>{
+            setTimeout(()=>{ wrap.classList.remove('vis'); fill.style.width='0%'; }, 2000);
+            resolve({ url, type: file.type });
+          })
+          .catch(dlErr=>{
+            wrap.classList.remove('vis');
+            reject(new Error('getDownloadURL failed: ' + (dlErr.message || dlErr.code)));
+          });
       }
     );
   });
@@ -1358,11 +1375,18 @@ async function upStock(){
     }
     document.getElementById('f1').focus();
   }catch(err){
-    tst('Firebase error: '+err.message,true);
+    // Always log to console AND show toast so nothing is silently swallowed
+    const msg = err?.message || err?.code || String(err) || 'Unknown error';
+    console.error('upStock error:', err);
+    tst('Error: ' + msg, true);
   }finally{
     btn.disabled=false;
-    if(!editId){
+    // Re-read editId here because cancelEdit() may have cleared it
+    const stillEditing = !!document.getElementById('cancBtn').classList.contains('vis');
+    if(!stillEditing){
       btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg> ADD TO STOCK';
+    }else{
+      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> SAVE CHANGES';
     }
   }
 }
