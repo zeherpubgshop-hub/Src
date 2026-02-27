@@ -474,7 +474,7 @@ footer a:hover{color:var(--cyan)}
         <div class="uz" id="uz">
           <input type="file" id="f5" accept="image/*,video/*" onchange="onFileSelect(this)"/>
           <div class="ui">🖼️</div>
-          <p><b>Click to upload</b> or drag & drop<br/>Images (JPG/PNG/WEBP) or Videos (MP4)</p>
+          <p><b>Click to upload</b> or drag & drop<br/>Images (JPG/PNG/WEBP) · Videos any size (MP4/MOV)</p>
         </div>
         <img class="media-pre" id="imgPre" alt="Preview"/>
         <video class="media-pre" id="vidPre" controls muted playsinline></video>
@@ -528,8 +528,6 @@ import { getFirestore, collection, addDoc, doc,
          updateDoc, deleteDoc, onSnapshot,
          query, orderBy, writeBatch, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getAuth, signInAnonymously, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -546,7 +544,6 @@ const firebaseConfig = {
 
 const app     = initializeApp(firebaseConfig);
 const db      = getFirestore(app);
-const storage = getStorage(app);
 const auth    = getAuth(app);
 const COL     = "stock";
 
@@ -566,7 +563,7 @@ let authReady   = false;
 let allTags     = ["Conqueror","Ace","Diamond","Crown","Platinum","Gold","X-Suit","Budget","Rare","Featured"];
 let selectedTags= [];
 
-// ── SIGN IN ANONYMOUSLY (needed for Storage rules) ────
+// ── SIGN IN ANONYMOUSLY (needed to write to Firestore) ────
 signInAnonymously(auth).catch(e=>console.warn("anon auth failed:",e));
 onAuthStateChanged(auth, user => {
   authReady = !!user;
@@ -723,6 +720,10 @@ document.addEventListener('click',e=>{
   }
 });
 
+// ── CLOUDINARY CONFIG (free, no billing needed) ──────
+const CLD_CLOUD  = "dlhskm8vf";
+const CLD_PRESET = "qz6nixcz";
+
 // ── FILE SELECT ───────────────────────────────────────
 function onFileSelect(inp){
   const f=inp.files[0];if(!f)return;
@@ -733,38 +734,79 @@ function onFileSelect(inp){
     r.onload=ev=>{imgPre.src=ev.target.result;imgPre.style.display='block';vidPre.style.display='none';vidPre.src='';};
     r.readAsDataURL(f);
   } else if(f.type.startsWith('video/')){
+    // Show local preview while upload happens later
     vidPre.src=URL.createObjectURL(f);
     vidPre.style.display='block';
     imgPre.style.display='none';imgPre.src='';
   }
 }
 
-// ── UPLOAD FILE TO FIREBASE STORAGE (with progress) ──
+// ── UPLOAD: images → base64 in Firestore, videos → Cloudinary ──
 function uploadFile(file){
   return new Promise((resolve,reject)=>{
-    const ext=file.name.split('.').pop();
-    const path=`stock/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-    const storageRef=ref(storage,path);
-    const task=uploadBytesResumable(storageRef,file);
     const progWrap=document.getElementById('progWrap');
     const progFill=document.getElementById('progFill');
     const progLabel=document.getElementById('progLabel');
     progWrap.style.display='block';
-    task.on('state_changed',
-      snap=>{
-        const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
-        progFill.style.width=pct+'%';
-        progLabel.textContent=`Uploading ${pct}%...`;
-      },
-      err=>{ progWrap.style.display='none'; reject(err); },
-      async ()=>{
-        progFill.style.width='100%';
-        progLabel.textContent='Upload complete!';
-        const url=await getDownloadURL(task.snapshot.ref);
-        setTimeout(()=>{ progWrap.style.display='none'; },800);
-        resolve({url, isVideo: file.type.startsWith('video/')});
-      }
-    );
+    progFill.style.width='5%';
+    progLabel.textContent='Starting...';
+
+    if(file.type.startsWith('image/')){
+      // ── IMAGE: compress via canvas then store as base64 in Firestore ──
+      const img=new Image();
+      const objUrl=URL.createObjectURL(file);
+      img.onload=()=>{
+        URL.revokeObjectURL(objUrl);
+        progFill.style.width='50%';progLabel.textContent='Compressing image...';
+        const MAX=1080;
+        let w=img.width,h=img.height;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const b64=canvas.toDataURL('image/jpeg',0.85);
+        progFill.style.width='100%';progLabel.textContent='Image ready ✓';
+        setTimeout(()=>{progWrap.style.display='none';},700);
+        resolve({url:b64, isVideo:false});
+      };
+      img.onerror=()=>{progWrap.style.display='none';reject(new Error('Image load failed'));};
+      img.src=objUrl;
+
+    } else {
+      // ── VIDEO: upload to Cloudinary via XMLHttpRequest (gives real progress %) ──
+      progLabel.textContent='Uploading video to Cloudinary...';
+      const fd=new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', CLD_PRESET);
+      fd.append('resource_type', 'video');
+
+      const xhr=new XMLHttpRequest();
+      xhr.open('POST',`https://api.cloudinary.com/v1_1/${CLD_CLOUD}/video/upload`);
+
+      xhr.upload.onprogress=e=>{
+        if(e.lengthComputable){
+          const pct=Math.round((e.loaded/e.total)*95);
+          progFill.style.width=pct+'%';
+          const mb=(e.loaded/1048576).toFixed(1);
+          const tot=(e.total/1048576).toFixed(1);
+          progLabel.textContent=`Uploading ${pct}% · ${mb} / ${tot} MB`;
+        }
+      };
+      xhr.onload=()=>{
+        if(xhr.status===200){
+          const res=JSON.parse(xhr.responseText);
+          progFill.style.width='100%';
+          progLabel.textContent='Video uploaded ✓';
+          setTimeout(()=>{progWrap.style.display='none';},700);
+          resolve({url:res.secure_url, isVideo:true});
+        } else {
+          progWrap.style.display='none';
+          reject(new Error('Cloudinary error: '+xhr.status));
+        }
+      };
+      xhr.onerror=()=>{progWrap.style.display='none';reject(new Error('Network error during upload'));};
+      xhr.send(fd);
+    }
   });
 }
 
