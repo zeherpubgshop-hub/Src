@@ -95,14 +95,25 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .stitle{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:700;color:#fff;letter-spacing:0.5px;display:flex;align-items:center;gap:8px}
 .stitle::before{content:'//';color:var(--cyan);font-size:.75rem}
 .ftabs{display:flex;gap:6px;flex-wrap:wrap}
-.ft{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:3px;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;letter-spacing:1px}
+.ft{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 13px;border-radius:3px;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Space Grotesk',sans-serif;letter-spacing:1px;white-space:nowrap}
 .ft.on,.ft:hover{background:rgba(79,143,255,0.1);border-color:var(--blue);color:var(--blue)}
+
+@media(max-width:580px){
+  .sh{flex-direction:column;align-items:stretch}
+  .stitle{justify-content:center}
+  .ftabs{justify-content:center}
+  .ft{flex:1;min-width:0;text-align:center;font-size:.65rem;padding:6px 8px}
+}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:14px}
 
 /* ── CARD ── */
 .sc{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .3s;position:relative;display:flex;flex-direction:column}
 .sc:hover{transform:translateY(-5px);border-color:rgba(79,143,255,0.38);box-shadow:0 18px 48px rgba(0,0,0,.55),0 0 28px rgba(79,143,255,0.07)}
-.sc.sold{opacity:.38;pointer-events:none;filter:grayscale(1) brightness(.7)}
+.sc.sold{opacity:.85}
+.sc.sold .ciw{position:relative}
+.sc.sold .ciw::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.5) 100%);z-index:5;backdrop-filter:blur(1px)}
+.sc.sold .ciw::after{content:'SOLD';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;font-size:2rem;font-weight:900;font-family:'Space Grotesk',sans-serif;letter-spacing:8px;color:#fff;text-transform:uppercase;padding:16px 40px;background:rgba(220,38,38,0.95);border-radius:4px;box-shadow:0 8px 32px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.1)}
+.sc.sold .ci,.sc.sold .ci-vid,.sc.sold .cip{filter:grayscale(0.6) brightness(0.7)}
 .ciw{position:relative;flex-shrink:0}
 .ci{width:100%;aspect-ratio:4/3;object-fit:cover;background:#040810;display:block}
 .ci,.ci-vid{-webkit-user-select:none;user-select:none;pointer-events:auto}
@@ -112,6 +123,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;ba
 .sbadge{position:absolute;top:9px;right:9px;font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:2px;letter-spacing:0.5px;text-transform:uppercase;font-family:'Space Grotesk',sans-serif}
 .sbadge.sold-b{background:rgba(255,50,50,0.92);color:#fff;box-shadow:0 2px 8px rgba(255,50,50,0.4)}
 .sbadge.live-b{background:rgba(37,211,102,0.92);color:#000;box-shadow:0 2px 8px rgba(37,211,102,0.4)}
+.qbadge{position:absolute;top:9px;left:9px;font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:2px;letter-spacing:0.5px;font-family:'Space Grotesk',sans-serif;background:rgba(0,212,255,0.92);color:#000;box-shadow:0 2px 8px rgba(0,212,255,0.4)}
 .cb{padding:13px;flex:1;display:flex;flex-direction:column}
 .ctitle{font-family:'Space Grotesk',sans-serif;font-size:.76rem;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.4;letter-spacing:.4px;word-break:break-word}
 .ctags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
@@ -190,13 +202,38 @@ footer a:hover{color:var(--cyan)}
 
 /* ── ADMIN ── */
 #av{display:none;position:relative;z-index:2}
-.abar{background:rgba(8,13,24,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 18px;position:sticky;top:0;z-index:200}
-.abar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),var(--blue),transparent);opacity:.45}
-.abari{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:12px;flex-wrap:wrap;padding:6px 0}
-.abt{font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:700;color:var(--cyan);letter-spacing:1px;display:flex;align-items:center;gap:7px}
-.abt::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:blink 1.5s infinite;box-shadow:0 0 7px var(--cyan)}
-.abody{max-width:1240px;margin:0 auto;padding:22px 18px;display:grid;grid-template-columns:370px 1fr;gap:20px;align-items:start}
-.ap{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden;top:0;position:sticky;top:76px}
+.abar{background:rgba(8,13,24,0.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 20px;position:sticky;top:0;z-index:200}
+.abari{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.abt{font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;color:#fff;letter-spacing:1px}
+.abody{max-width:1200px;margin:0 auto;padding:28px 20px}
+
+/* Stats Bar */
+.ash{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.astats{display:flex;gap:20px;flex-wrap:wrap;font-size:.8rem}
+.as span{font-weight:800;font-size:.95rem;margin-left:4px}
+.as.t span{color:var(--cyan)}.as.a span{color:var(--green)}.as.s span{color:var(--red)}
+
+/* Simple Sections */
+.admin-section{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;padding:20px 24px}
+.admin-section-title{font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:700;color:var(--cyan);letter-spacing:1.5px;margin-bottom:18px;text-transform:uppercase}
+
+/* Form Styling */
+.fg{margin-bottom:16px}
+.fl{display:block;font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:7px;font-family:'Space Grotesk',sans-serif}
+.fi2,.fta,.fse{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:11px 14px;color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;outline:none;transition:all .2s}
+.fi2:focus,.fta:focus,.fse:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,143,255,0.1)}
+.fta{resize:vertical;min-height:80px;line-height:1.6}
+
+/* Buttons */
+.bupl{width:100%;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:6px;padding:13px;font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+.bupl:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,143,255,0.35)}
+.bupl:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bupl.edit-mode{background:linear-gradient(135deg,#ffa500,var(--gold))}
+.btn-cancel-edit{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;color:var(--muted);margin-top:8px;display:none;transition:all .2s}
+.btn-cancel-edit:hover{color:var(--text);border-color:var(--red);background:rgba(255,60,60,0.05)}
+
+.bcl{background:rgba(255,60,60,0.1);color:var(--red);border:1px solid rgba(255,60,60,0.25);padding:7px 14px;border-radius:5px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:all .2s}
+.bcl:hover{background:rgba(255,60,60,0.18);border-color:var(--red)}
 .ap::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
 .apt{font-family:'Space Grotesk',sans-serif;font-size:.74rem;color:#fff;margin-bottom:16px;letter-spacing:1.5px;padding-bottom:11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:7px}
 .apt-mode{font-size:.6rem;padding:2px 8px;border-radius:3px;letter-spacing:1px;font-weight:700}
@@ -264,6 +301,17 @@ footer a:hover{color:var(--cyan)}
 .as.t span{color:var(--cyan)}.as.a span{color:var(--green)}.as.s span{color:var(--red)}
 .bcl{background:rgba(255,60,60,0.07);color:#ff6b6b;border:1px solid rgba(255,60,60,0.17);padding:5px 11px;border-radius:4px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:.5px;transition:all .2s}
 .bcl:hover{background:rgba(255,60,60,0.15)}
+
+/* ── TAG MANAGEMENT ── */
+.tag-mgmt{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
+.tag-mgmt::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.tag-mgmt-title{font-family:'Space Grotesk',sans-serif;font-size:.74rem;color:#fff;margin-bottom:12px;letter-spacing:1.5px;font-weight:700}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px}
+.tag-item{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:.7rem;font-family:'Space Grotesk',sans-serif}
+.tag-item-name{font-weight:700}
+.tag-item-color{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,0.2)}
+.tag-item-del{cursor:pointer;color:var(--red);margin-left:4px;opacity:.7;font-weight:700;font-size:.8rem}
+.tag-item-del:hover{opacity:1}
 .agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
 .adc{background:var(--bg3);border:1px solid var(--border);border-radius:7px;overflow:hidden;position:relative;transition:border .2s}
 .adc:hover{border-color:var(--border2)}
@@ -375,20 +423,7 @@ footer a:hover{color:var(--cyan)}
     <div class="hero-compact">
       <div class="hero-left">
         <h1>PREMIUM PUBG <span class="g">MOBILE ACCOUNTS</span></h1>
-        <p class="hsub">37-Day Unlinking Guarantee • Verified Ownership • Instant WhatsApp Handover</p>
-      </div>
-      
-      <div class="msme-compact">
-        <div class="msme-row">
-          <div class="msme-icon-sm">✓</div>
-          <div class="msme-title-sm">GOVT REGISTERED</div>
-        </div>
-        <div class="msme-reg-sm">UDYAM-MP-17-0063317</div>
-        <div class="msme-tags">
-          <span class="msme-tag">MSME</span>
-          <span class="msme-tag">Since 2023</span>
-          <span class="msme-tag">Verified</span>
-        </div>
+        <p class="hsub">37-Day Unlinking Guarantee • Verified Ownership • Instant Handover • Government Registered</p>
       </div>
     </div>
     
@@ -398,23 +433,11 @@ footer a:hover{color:var(--cyan)}
       <div class="ti-inline"><strong>&lt;30 MIN</strong><small>Handover</small></div>
       <div class="ti-inline"><strong>2021+</strong><small>Trust</small></div>
     </div>
-    
-    <div class="hctas">
-      <a class="btn bwa" href="https://wa.me/918982790894?text=Hi%20I'm%20interested%20in%20a%20PUBG%20account" target="_blank" rel="noopener">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </a>
-    </div>
   </section>
 
   <section class="ssec">
     <div class="sh">
       <div class="stitle">AVAILABLE STOCK</div>
-      <div class="ftabs">
-        <div class="ft on" onclick="filt('all',this)">ALL</div>
-        <div class="ft" onclick="filt('available',this)">AVAILABLE</div>
-        <div class="ft" onclick="filt('sold',this)">SOLD</div>
-      </div>
     </div>
     <div class="sgrid" id="sgrid"></div>
   </section>
@@ -436,9 +459,40 @@ footer a:hover{color:var(--cyan)}
   </div>
 
   <footer>
-    <p style="margin-bottom:7px"><a href="https://wa.me/918982790894" target="_blank">+91 89827 90894</a> • <a href="mailto:zeherpubgshop@gmail.com">zeherpubgshop@gmail.com</a></p>
-    <p style="margin-bottom:4px;font-size:.72rem;color:var(--blue)">UDYAM Reg: UDYAM-MP-17-0063317 • Govt. Registered MSME</p>
-    <p>&copy; <span id="fy"></span> ZEHER STORE — All rights reserved.</p>
+    <div style="max-width:900px;margin:0 auto;text-align:center">
+      <!-- Business Name -->
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:12px;letter-spacing:1px">ZEHER STORE</div>
+      
+      <!-- Contact Info -->
+      <div style="margin-bottom:14px;display:flex;gap:20px;justify-content:center;flex-wrap:wrap;font-size:.82rem">
+        <a href="https://wa.me/918982790894" target="_blank" style="display:flex;align-items:center;gap:6px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          +91 89827 90894
+        </a>
+        <a href="mailto:zeherpubgshop@gmail.com" style="display:flex;align-items:center;gap:6px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          zeherpubgshop@gmail.com
+        </a>
+      </div>
+      
+      <!-- Government Registration -->
+      <div style="background:rgba(79,143,255,0.05);border:1px solid rgba(79,143,255,0.15);border-radius:6px;padding:12px 16px;margin-bottom:14px;display:inline-block">
+        <div style="font-size:.7rem;color:var(--blue);font-weight:700;font-family:'Space Grotesk',sans-serif;margin-bottom:4px;letter-spacing:1px">🏛️ GOVERNMENT REGISTERED ENTERPRISE</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:6px">Ministry of Micro, Small and Medium Enterprises</div>
+        <div style="font-size:.7rem;color:var(--text)"><strong>UDYAM Registration:</strong> UDYAM-MP-17-0063317</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px">Registered Since: December 2023 • Category: Micro Enterprise - Trading</div>
+      </div>
+      
+      <!-- Business Details -->
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:10px;line-height:1.6">
+        <strong style="color:var(--text)">Business Address:</strong> 25, Aqua Clean Service Limited, Pithampur Block 9, Dhar, Madhya Pradesh - 454775
+      </div>
+      
+      <!-- Copyright -->
+      <div style="padding-top:12px;border-top:1px solid rgba(79,143,255,0.1);font-size:.72rem;color:var(--muted)">
+        &copy; <span id="fy"></span> ZEHER STORE - All Rights Reserved • Trusted Since 2021
+      </div>
+    </div>
   </footer>
 
   <div class="fab">
@@ -477,16 +531,34 @@ footer a:hover{color:var(--cyan)}
     </div>
   </div>
   <div class="abody">
-    <!-- LEFT: UPLOAD FORM -->
-    <div class="ap">
-      <div class="apt">
-        <span id="form-title-label">📦 ADD NEW STOCK</span>
-        <span class="apt-mode adding" id="form-mode-badge">ADDING</span>
+    
+    <!-- STOCK STATS -->
+    <div class="ash">
+      <div class="astats">
+        <div class="as t">Total: <span id="ct">0</span></div>
+        <div class="as a">Available: <span id="ca">0</span></div>
+        <div class="as s">Sold: <span id="cs">0</span></div>
       </div>
-
-      <div class="fg"><label class="fl">Account Title *</label><input class="fi2" id="f1" type="text" placeholder="e.g. Conqueror Account – Poseidon X-Suit"/></div>
+      <button class="bcl" onclick="if(confirm('Delete ALL stock from Firebase?'))clrAll()">🗑 Clear All</button>
+    </div>
+    
+    <!-- ADD/EDIT FORM -->
+    <div class="admin-section">
+      <div class="admin-section-title" id="form-title-label">
+        📦 ADD NEW ACCOUNT
+        <span class="apt-mode adding" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">ADDING</span>
+      </div>
+      
+      <div class="fg"><label class="fl">Title *</label><input class="fi2" id="f1" type="text" placeholder="e.g. Conqueror Account – Poseidon X-Suit"/></div>
       <div class="fg"><label class="fl">Description</label><textarea class="fta" id="f2" placeholder="e.g. Season 24 Conqueror, 200+ outfits, Glacier M416..."></textarea></div>
-      <div class="fg"><label class="fl">Price (USD) *</label><input class="fi2" id="f3" type="text" placeholder="e.g. $280 or Contact for Price"/></div>
+      
+      
+      <div class="fg"><label class="fl">Price *</label><input class="fi2" id="f3" type="text" placeholder="e.g. $280 or Contact for Price"/></div>
+      
+      <div class="fg">
+        <label class="fl">Display Order</label>
+        <input class="fi2" id="f9" type="number" min="1" placeholder="Leave empty for auto-order"/>
+      </div>
 
       <!-- TAG DROPDOWN -->
       <div class="fg">
@@ -519,7 +591,7 @@ footer a:hover{color:var(--cyan)}
         <div class="uz" id="uz">
           <input type="file" id="f5" accept="image/*,video/*" onchange="onFileSelect(this)"/>
           <div class="ui">🖼️</div>
-          <p><b>Click to upload</b> or drag & drop<br/>Images (JPG/PNG/WEBP) · Videos any size (MP4/MOV)</p>
+          <p><b>Click or drag & drop</b><br/>Images or Videos</p>
         </div>
         <img class="media-pre" id="imgPre" alt="Preview"/>
         <video class="media-pre" id="vidPre" controls muted playsinline></video>
@@ -529,33 +601,28 @@ footer a:hover{color:var(--cyan)}
         </div>
       </div>
 
-      <div class="cr"><input type="checkbox" id="f7"/><label for="f7">Mark as <strong>Sold</strong> immediately</label></div>
+      <div class="cr"><input type="checkbox" id="f7"/><label for="f7">Mark as <strong>Sold</strong></label></div>
 
       <button class="bupl" id="uplBtn" onclick="submitForm()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
-        <span id="uplBtnTxt">ADD TO STOCK</span>
+        <span id="uplBtnTxt">ADD ACCOUNT</span>
       </button>
-      <button class="btn-cancel-edit" id="cancelEditBtn" onclick="cancelEdit()">✕ CANCEL EDIT</button>
+      <button class="btn-cancel-edit" id="cancelEditBtn" onclick="cancelEdit()">✕ Cancel</button>
     </div>
 
-    <!-- RIGHT: STOCK GRID -->
-    <div>
-      <div class="ash">
-        <div>
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:.76rem;font-weight:700;color:#fff;margin-bottom:7px;letter-spacing:1px">📋 CURRENT STOCK <span style="color:var(--muted);font-weight:400;font-size:.6rem">(live · Firebase)</span></div>
-          <div class="astats">
-            <div class="as t">Total: <span id="ct">0</span></div>
-            <div class="as a">Available: <span id="ca">0</span></div>
-            <div class="as s">Sold: <span id="cs">0</span></div>
-          </div>
-        </div>
-        <button class="bcl" onclick="if(confirm('Delete ALL stock from Firebase?'))clrAll()">🗑 Clear All</button>
-      </div>
+    <!-- TAG MANAGEMENT -->
+    <div class="admin-section">
+      <div class="admin-section-title">🏷️ MANAGE TAGS</div>
+      <div class="tag-list" id="tagMgmtList"></div>
+    </div>
+
+    <!-- ALL ACCOUNTS -->
+    <div class="admin-section">
+      <div class="admin-section-title">📦 ALL ACCOUNTS</div>
       <div class="agrid" id="agrid"></div>
-      <div class="aem" id="aem" style="display:none">
-        <div class="aei">📭</div>
-        <p style="font-family:'Space Grotesk',sans-serif;font-size:.72rem;letter-spacing:1px;margin-bottom:6px">NO STOCK YET</p>
-        <p style="font-size:.8rem">Add your first account using the form.</p>
+      <div class="aem" id="aem" style="display:none;text-align:center;padding:40px 20px;color:var(--muted)">
+        <div style="font-size:3rem;margin-bottom:12px">📭</div>
+        <p style="font-size:.85rem">No accounts yet. Add your first one above!</p>
       </div>
     </div>
   </div>
@@ -607,8 +674,20 @@ let pendingFile = null;   // File object selected for upload
 let authReady   = false;
 let allTags     = ["Conqueror","Ace","Diamond","Crown","Platinum","Gold","X-Suit","Budget","Rare","Featured"];
 let selectedTags= [];
-let tagColors   = {}; // Maps tag name to color class (gold, blue, green, red, purple, cyan)
+let tagColors   = {
+  "Conqueror": "gold",
+  "Ace": "purple", 
+  "Diamond": "cyan",
+  "Crown": "gold",
+  "Platinum": "blue",
+  "Gold": "gold",
+  "X-Suit": "purple",
+  "Budget": "green",
+  "Rare": "red",
+  "Featured": "cyan"
+}; // Maps tag name to color class
 let newTagColor = 'gold'; // Default color for new tags
+let selectedCategory = ''; // Category for current item (budget, flex, heavy)
 
 // ── SIGN IN ANONYMOUSLY (needed to write to Firestore) ────
 signInAnonymously(auth).catch(e=>console.warn("anon auth failed:",e));
@@ -872,7 +951,7 @@ async function submitForm(){
   const btn=document.getElementById('uplBtn');
   const btnTxt=document.getElementById('uplBtnTxt');
   btn.disabled=true;
-  btnTxt.textContent=editingId?'SAVING CHANGES...':'UPLOADING...';
+  btnTxt.textContent=editingId?'SAVING...':'ADDING...';
 
   try{
     let mediaUrl=null, isVideo=false;
@@ -884,10 +963,12 @@ async function submitForm(){
       isVideo=result.isVideo;
     }
 
+    const posVal=document.getElementById('f9').value.trim();
     const data={
       title:t,
       desc:document.getElementById('f2').value.trim(),
       price:document.getElementById('f3').value.trim(),
+      position:posVal?parseInt(posVal):999999,
       tags:[...selectedTags],
       sold:document.getElementById('f7').checked,
     };
@@ -896,7 +977,7 @@ async function submitForm(){
       // EDIT MODE — only update mediaUrl if new file was selected
       if(mediaUrl){data.mediaUrl=mediaUrl;data.isVideo=isVideo;}
       await updateDoc(doc(db,COL,editingId), data);
-      tst('✅ Account updated in Firebase!');
+      tst('✅ Account updated!');
       cancelEdit();
     } else {
       // ADD MODE
@@ -925,6 +1006,7 @@ function editItem(fid){
   document.getElementById('f1').value=item.title||'';
   document.getElementById('f2').value=item.desc||'';
   document.getElementById('f3').value=item.price||'';
+  document.getElementById('f9').value=item.position||'';
   document.getElementById('f7').checked=!!item.sold;
   selectedTags=[...(item.tags||[])];
   renderTagPills();
@@ -935,27 +1017,23 @@ function editItem(fid){
     else{imgPre.src=item.mediaUrl;imgPre.style.display='block';vidPre.style.display='none';}
   }
   // Update UI
-  document.getElementById('form-title-label').textContent='✏️ EDITING ACCOUNT';
-  document.getElementById('form-mode-badge').textContent='EDITING';
-  document.getElementById('form-mode-badge').className='apt-mode editing';
+  document.getElementById('form-title-label').innerHTML='✏️ EDIT ACCOUNT<span class="apt-mode editing" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">EDITING</span>';
   document.getElementById('uplBtnTxt').textContent='SAVE CHANGES';
   document.getElementById('uplBtn').classList.add('edit-mode');
   document.getElementById('cancelEditBtn').style.display='block';
   // Scroll to form
-  document.querySelector('.ap').scrollIntoView({behavior:'smooth',block:'start'});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function cancelEdit(){
   editingId=null;pendingFile=null;
   clearForm();
-  document.getElementById('form-title-label').textContent='📦 ADD NEW STOCK';
-  document.getElementById('form-mode-badge').textContent='ADDING';
-  document.getElementById('form-mode-badge').className='apt-mode adding';
-  document.getElementById('uplBtnTxt').textContent='ADD TO STOCK';
+  document.getElementById('form-title-label').innerHTML='📦 ADD NEW ACCOUNT<span class="apt-mode adding" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">ADDING</span>';
+  document.getElementById('uplBtnTxt').textContent='ADD ACCOUNT';
   document.getElementById('uplBtn').classList.remove('edit-mode');
   document.getElementById('cancelEditBtn').style.display='none';
 }
 function clearForm(){
-  ['f1','f2','f3'].forEach(id=>document.getElementById(id).value='');
+  ['f1','f2','f3','f9'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f5').value='';
   document.getElementById('f7').checked=false;
   document.getElementById('imgPre').style.display='none';
@@ -1043,30 +1121,69 @@ function submitOrder(){
 // ── PUBLIC RENDER ─────────────────────────────────────
 function renderPub(){
   const g=document.getElementById('sgrid');
-  let items=stock;
-  if(cf==='available')items=stock.filter(s=>!s.sold);
-  if(cf==='sold')items=stock.filter(s=>s.sold);
-  if(!items.length){
-    g.innerHTML=`<div class="empty"><div class="ei">🎮</div><h3>${cf!=='all'?'NO ACCOUNTS IN THIS CATEGORY':'NO STOCK LISTED YET'}</h3><p>New drops regularly. Ask us on WhatsApp!</p><a class="btn bwa" href="https://wa.me/${WA}" target="_blank" style="display:inline-flex">${WASVG} Check via WhatsApp</a></div>`;
+  
+  // Separate available and sold items
+  let availableItems=stock.filter(s=>!s.sold);
+  let soldItems=stock.filter(s=>s.sold);
+  
+  // Sort both by position
+  availableItems.sort((a,b)=>(a.position||999999)-(b.position||999999));
+  soldItems.sort((a,b)=>(a.position||999999)-(b.position||999999));
+  
+  if(!availableItems.length && !soldItems.length){
+    g.innerHTML=`<div class="empty"><div class="ei">🎮</div><h3>NO ACCOUNTS AVAILABLE</h3><p>New drops regularly. Contact us on WhatsApp!</p></div>`;
     return;
   }
-  g.innerHTML=items.map(item=>{
-    const fid=item.firestoreId;
-    let media='<div class="cip">🎮</div>';
-    if(item.mediaUrl){
-      media=item.isVideo
-        ?`<video class="ci-vid" src="${item.mediaUrl}" controls controlsList="nodownload nofullscreen" preload="metadata" playsinline oncontextmenu="return false"></video>`
-        :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy" oncontextmenu="return false" draggable="false"/>`;
-    }
-    const badge=item.sold?`<div class="sbadge sold-b">SOLD</div>`:`<div class="sbadge live-b">AVAILABLE</div>`;
-    const tags=(item.tags&&item.tags.length)?`<div class="ctags">${item.tags.map(t=>{
-      const colorClass=tagColors[t]||'';
-      return `<span class="ctag ${colorClass}">${esc(t)}</span>`;
-    }).join('')}</div>`:'';
-    const pr=item.price?`<div class="cprice">${item.price.startsWith('$')||item.price.startsWith('₹')||item.price.toLowerCase().includes('contact')?esc(item.price):'$'+esc(item.price)}</div>`:`<div class="cprice fp">Contact for Price</div>`;
-    const cta=!item.sold?`<button class="ccta" onclick="window._openOrder('${fid}')">${WASVG} Buy Now</button>`:'';
-    return `<div class="sc${item.sold?' sold':''}"><div class="ciw">${media}${badge}</div><div class="cb"><div class="ctitle">${esc(item.title)}</div>${tags}${item.desc?`<div class="cdesc">${esc(item.desc)}</div>`:''}<div class="cf">${pr}${cta}</div></div></div>`;
-  }).join('');
+  
+  let html='';
+  
+  // Render available items
+  if(availableItems.length){
+    html+=availableItems.map(item=>{
+      const fid=item.firestoreId;
+      let media='<div class="cip">🎮</div>';
+      if(item.mediaUrl){
+        media=item.isVideo
+          ?`<video class="ci-vid" src="${item.mediaUrl}" controls controlsList="nodownload nofullscreen" preload="metadata" playsinline oncontextmenu="return false"></video>`
+          :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy" oncontextmenu="return false" draggable="false"/>`;
+      }
+      const badge=`<div class="sbadge live-b">AVAILABLE</div>`;
+      const tags=(item.tags&&item.tags.length)?`<div class="ctags">${item.tags.map(t=>{
+        const colorClass=tagColors[t]||'';
+        return `<span class="ctag ${colorClass}">${esc(t)}</span>`;
+      }).join('')}</div>`:'';
+      const pr=item.price?`<div class="cprice">${item.price.startsWith('$')||item.price.startsWith('₹')||item.price.toLowerCase().includes('contact')?esc(item.price):'$'+esc(item.price)}</div>`:`<div class="cprice fp">Contact for Price</div>`;
+      const cta=`<button class="ccta" onclick="window._openOrder('${fid}')">${WASVG} Buy Now</button>`;
+      return `<div class="sc"><div class="ciw">${media}${badge}</div><div class="cb"><div class="ctitle">${esc(item.title)}</div>${tags}${item.desc?`<div class="cdesc">${esc(item.desc)}</div>`:''}<div class="cf">${pr}${cta}</div></div></div>`;
+    }).join('');
+  }
+  
+  // Add "RECENTLY SOLD" header if there are sold items
+  if(soldItems.length){
+    html+=`<div style="grid-column:1/-1;margin-top:40px;margin-bottom:20px">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:900;color:#8b0000;text-align:center;letter-spacing:3px;text-shadow:0 0 20px rgba(139,0,0,0.3)">RECENTLY SOLD</h2>
+    </div>`;
+    
+    // Render sold items
+    html+=soldItems.map(item=>{
+      const fid=item.firestoreId;
+      let media='<div class="cip">🎮</div>';
+      if(item.mediaUrl){
+        media=item.isVideo
+          ?`<video class="ci-vid" src="${item.mediaUrl}" controls controlsList="nodownload nofullscreen" preload="metadata" playsinline oncontextmenu="return false"></video>`
+          :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy" oncontextmenu="return false" draggable="false"/>`;
+      }
+      const badge=`<div class="sbadge sold-b">SOLD</div>`;
+      const tags=(item.tags&&item.tags.length)?`<div class="ctags">${item.tags.map(t=>{
+        const colorClass=tagColors[t]||'';
+        return `<span class="ctag ${colorClass}">${esc(t)}</span>`;
+      }).join('')}</div>`:'';
+      const pr=item.price?`<div class="cprice" style="opacity:.7">${item.price.startsWith('$')||item.price.startsWith('₹')||item.price.toLowerCase().includes('contact')?esc(item.price):'$'+esc(item.price)}</div>`:`<div class="cprice fp" style="opacity:.7">Contact for Price</div>`;
+      return `<div class="sc sold"><div class="ciw">${media}${badge}</div><div class="cb"><div class="ctitle">${esc(item.title)}</div>${tags}${item.desc?`<div class="cdesc">${esc(item.desc)}</div>`:''}<div class="cf">${pr}</div></div></div>`;
+    }).join('');
+  }
+  
+  g.innerHTML=html;
 }
 function filt(f,el){cf=f;document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderPub();}
 
@@ -1078,22 +1195,62 @@ function renderAdm(){
   document.getElementById('ca').textContent=av;
   document.getElementById('cs').textContent=so;
   document.getElementById('ahstat').textContent=`${av} available · ${so} sold`;
+  
+  // Render tag management
+  renderTagManagement();
+  
   if(!stock.length){g.innerHTML='';em.style.display='block';return;}
   em.style.display='none';
-  g.innerHTML=[...stock].reverse().map(item=>{
+  
+  // Sort by position for admin view too
+  const sortedStock=[...stock].sort((a,b)=>(a.position||999999)-(b.position||999999));
+  
+  g.innerHTML=sortedStock.map(item=>{
     const fid=item.firestoreId;
     let mediaTh='<div class="ano">🎮</div>';
     if(item.mediaUrl){
       mediaTh=item.isVideo
-        ?`<video src="${item.mediaUrl}" muted playsinline></video>`
+        ?`<video src="${item.mediaUrl}" controls muted playsinline controlsList="nodownload"></video>`
         :`<img src="${item.mediaUrl}" alt="${esc(item.title)}"/>`;
     }
     const sc=item.sold?`<div class="asc">SOLD</div>`:'';
+    const posBadge=item.position?`<div style="font-size:.6rem;color:var(--muted);margin-bottom:4px">Order: ${item.position}</div>`:'';
     const tb=item.sold
-      ?`<button class="ba bma" onclick="window._tgSold('${fid}')">✅ Avail</button>`
+      ?`<button class="ba bma" onclick="window._tgSold('${fid}')">✅ Available</button>`
       :`<button class="ba bms" onclick="window._tgSold('${fid}')">🔴 Sold</button>`;
-    return `<div class="adc"><div style="position:relative">${mediaTh}${sc}</div><div class="adcb"><div class="adn" title="${esc(item.title)}">${esc(item.title)}</div><div class="adprice">${item.price?esc(item.price):'No price'}</div><div class="ada">${tb}<button class="ba bed" onclick="window._editItem('${fid}')">✏️ Edit</button><button class="ba bdl" onclick="window._dlItem('${fid}')">🗑</button></div></div></div>`;
+    return `<div class="adc"><div style="position:relative">${mediaTh}${sc}</div><div class="adcb">${posBadge}<div class="adn" title="${esc(item.title)}">${esc(item.title)}</div><div class="adprice">${item.price?esc(item.price):'No price'}</div><div class="ada">${tb}<button class="ba bed" onclick="window._editItem('${fid}')">✏️ Edit</button><button class="ba bdl" onclick="window._dlItem('${fid}')">🗑</button></div></div></div>`;
   }).join('');
+}
+
+function renderTagManagement(){
+  const list=document.getElementById('tagMgmtList');
+  const colorMap={blue:'var(--blue)',gold:'var(--gold)',green:'var(--green)',red:'var(--red)',purple:'#e056fd',cyan:'var(--cyan)'};
+  list.innerHTML=allTags.map(tag=>{
+    const color=tagColors[tag]||'blue';
+    const bgColor=colorMap[color]||'var(--blue)';
+    return `<div class="tag-item">
+      <div class="tag-item-color" style="background:${bgColor}"></div>
+      <span class="tag-item-name">${esc(tag)}</span>
+      <span class="tag-item-del" onclick="window._deleteTag('${tag}')">×</span>
+    </div>`;
+  }).join('');
+}
+
+function deleteTag(tag){
+  if(!confirm(`Delete tag "${tag}"? This will remove it from all accounts.`))return;
+  allTags=allTags.filter(t=>t!==tag);
+  delete tagColors[tag];
+  selectedTags=selectedTags.filter(t=>t!==tag);
+  renderTagManagement();
+  rebuildTagDropdown();
+  renderTagPills();
+  tst(`Tag "${tag}" deleted`);
+}
+
+function toggleAdminSection(sectionId){
+  const section=document.getElementById(sectionId);
+  if(!section)return;
+  section.classList.toggle('collapsed');
 }
 
 // ── UTILS ─────────────────────────────────────────────
@@ -1125,6 +1282,7 @@ window.submitOrder= submitOrder;
 window.toggleTagDrop = toggleTagDrop;
 window.addNewTag  = addNewTag;
 window.selectTagColor = selectTagColor;
+window.toggleAdminSection = toggleAdminSection;
 window.clrAll     = clrAll;
 window._openOrder = openOrder;
 window._tgSold    = tgSold;
@@ -1132,6 +1290,7 @@ window._dlItem    = dlItem;
 window._editItem  = editItem;
 window._toggleTag = toggleTag;
 window._removeTag = removeTag;
+window._deleteTag = deleteTag;
 
 // ── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
