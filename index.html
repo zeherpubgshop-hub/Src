@@ -295,19 +295,98 @@ header::after{
   overflow-x:hidden;
   padding-right:4px;
   margin-bottom:8px;
+  position:relative;
 }
-/* Thin scrollbar styling */
-.cdesc::-webkit-scrollbar{width:3px}
-.cdesc::-webkit-scrollbar-track{background:transparent}
-.cdesc::-webkit-scrollbar-thumb{background:rgba(79,143,255,0.3);border-radius:3px}
-.cdesc::-webkit-scrollbar-thumb:hover{background:rgba(79,143,255,0.5)}
+/* Visual indicator - gradient fade when content overflows */
+.cdesc::after{
+  content:'';
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  height:1.2em;
+  background:linear-gradient(to bottom, transparent, var(--card));
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .3s;
+}
+.cdesc:not(:hover)::after{
+  opacity:1;
+}
+/* Thicker scrollbar for better visibility */
+.cdesc::-webkit-scrollbar{width:4px}
+.cdesc::-webkit-scrollbar-track{background:rgba(79,143,255,0.08);border-radius:4px}
+.cdesc::-webkit-scrollbar-thumb{background:rgba(79,143,255,0.4);border-radius:4px}
+.cdesc::-webkit-scrollbar-thumb:hover{background:rgba(79,143,255,0.7)}
+/* Scroll hint indicator */
+.scroll-hint{
+  position:absolute;
+  bottom:2px;
+  right:8px;
+  color:var(--blue);
+  font-size:1.2rem;
+  line-height:1;
+  opacity:0.6;
+  animation:bounce 2s infinite;
+  pointer-events:none;
+}
+@keyframes bounce{
+  0%, 100%{transform:translateY(0)}
+  50%{transform:translateY(3px)}
+}
+.cdesc:hover .scroll-hint{opacity:0.3}
 .cf{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;flex-wrap:wrap}
 .cprice{
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;
-  color:var(--gold);filter:drop-shadow(0 0 8px rgba(255,215,0,0.2));
-  flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.4rem;
+  font-weight:800;
+  letter-spacing:0.5px;
+  background:linear-gradient(135deg, #FFD700, #FFA500, #FF8C00);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 12px rgba(255,215,0,0.4));
+  flex-shrink:1;
+  min-width:0;
+  position:relative;
+  display:inline-block;
+  text-shadow:none;
 }
-.cprice.fp{color:var(--text2);font-size:1rem}
+.cprice::before{
+  content:'';
+  position:absolute;
+  inset:-4px;
+  background:radial-gradient(circle at center, rgba(255,215,0,0.15), transparent 70%);
+  z-index:-1;
+  border-radius:6px;
+  opacity:0;
+  transition:opacity .3s;
+}
+.sc:hover .cprice::before{opacity:1}
+.cprice.fp{
+  background:none;
+  -webkit-text-fill-color:var(--text2);
+  color:var(--text2);
+  font-size:1rem;
+  filter:none;
+}
+/* Price container */
+.price-container{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:flex-start;
+}
+/* Old price (strikethrough) */
+.cprice-old{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.85rem;
+  font-weight:600;
+  color:var(--text2);
+  text-decoration:line-through;
+  opacity:.6;
+  letter-spacing:0.3px;
+}
 .ccta{
   display:inline-flex;align-items:center;gap:6px;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
@@ -1633,17 +1712,8 @@ function renderPub(){
   let availableItems=stock.filter(s=>!s.sold);
   let soldItems=stock.filter(s=>s.sold);
   
-  // Sort both by newest first (addedAt date)
-  availableItems.sort((a,b)=>{
-    const dateA = new Date(a.addedAt || 0);
-    const dateB = new Date(b.addedAt || 0);
-    return dateB - dateA;
-  });
-  soldItems.sort((a,b)=>{
-    const dateA = new Date(a.addedAt || 0);
-    const dateB = new Date(b.addedAt || 0);
-    return dateB - dateA;
-  });
+  // Note: Sorting is now handled by the renderPub wrapper function below
+  // Don't sort here as it will override price/other sorting
   
   if(!availableItems.length && !soldItems.length){
     g.innerHTML=`<div class="empty"><div class="ei">🎮</div><h3>NO ACCOUNTS AVAILABLE</h3><p>New drops regularly. Contact us on WhatsApp!</p></div>`;
@@ -1664,21 +1734,23 @@ function renderPub(){
       }
       const badge=`<div class="sbadge live-b">AVAILABLE</div>`;
       
-      // Price display with discount
+      // Price display with discount - premium styling
       let priceHtml='';
       if(item.discountPrice){
         const origPrice = item.price?`${item.price.startsWith('$')||item.price.startsWith('₹')||item.price.toLowerCase().includes('contact')?esc(item.price):'$'+esc(item.price)}`:'';
         const discPrice = item.discountPrice?`${item.discountPrice.startsWith('$')||item.discountPrice.startsWith('₹')||item.discountPrice.toLowerCase().includes('contact')?esc(item.discountPrice):'$'+esc(item.discountPrice)}`:'';
-        priceHtml = `<div style="display:flex;flex-direction:column;gap:2px"><div class="cprice" style="font-size:.9rem;text-decoration:line-through;opacity:.5">${origPrice}</div><div class="cprice">${discPrice}</div></div>`;
+        priceHtml = `<div class="price-container"><div class="cprice-old">${origPrice}</div><div class="cprice">${discPrice}</div></div>`;
       } else {
         const pr=item.price?`${item.price.startsWith('$')||item.price.startsWith('₹')||item.price.toLowerCase().includes('contact')?esc(item.price):'$'+esc(item.price)}`:'Contact for Price';
-        priceHtml=`<div class="cprice${!item.price?' fp':''}">${pr}</div>`;
+        priceHtml=`<div class="price-container"><div class="cprice${!item.price?' fp':''}">${pr}</div></div>`;
       }
       
-      // Description with scrollbar - no button needed
+      // Description with scroll hint
       let descHtml = '';
       if(item.desc){
-        descHtml = `<div class="cdesc">${esc(item.desc)}</div>`;
+        const hasLongDesc = item.desc.length > 80;
+        const scrollHint = hasLongDesc ? `<span class="scroll-hint" title="Scroll to read more">⌄</span>` : '';
+        descHtml = `<div class="cdesc">${esc(item.desc)}${scrollHint}</div>`;
       }
       
       const cta=`<button class="ccta" onclick="window._openOrder('${fid}')">${WASVG} Buy Now</button>`;
@@ -1926,17 +1998,34 @@ renderPub = function(){
   const available = stockToSort.filter(s=>!s.sold);
   const sold = stockToSort.filter(s=>s.sold);
 
-  function parsePrice(p){
-    if(!p) return Infinity;
-    const n = parseFloat(p.replace(/[^0-9.]/g,''));
+  function parsePrice(item){
+    // Use discount price if available, otherwise regular price
+    const priceStr = item.discountPrice || item.price;
+    if(!priceStr) return Infinity;
+    const n = parseFloat(priceStr.replace(/[^0-9.]/g,''));
     return isNaN(n) ? Infinity : n;
   }
 
+  // Apply sorting based on mode
   if(_sortMode === 'price-asc'){
-    available.sort((a,b)=>parsePrice(a.price)-parsePrice(b.price));
+    available.sort((a,b)=>parsePrice(a)-parsePrice(b));
   } else if(_sortMode === 'price-desc'){
-    available.sort((a,b)=>parsePrice(b.price)-parsePrice(a.price));
+    available.sort((a,b)=>parsePrice(b)-parsePrice(a));
+  } else {
+    // Default: sort by newest first (addedAt date)
+    available.sort((a,b)=>{
+      const dateA = new Date(a.addedAt || 0);
+      const dateB = new Date(b.addedAt || 0);
+      return dateB - dateA;
+    });
   }
+  
+  // Sort sold items by date (always newest first)
+  sold.sort((a,b)=>{
+    const dateA = new Date(a.addedAt || 0);
+    const dateB = new Date(b.addedAt || 0);
+    return dateB - dateA;
+  });
 
   stock = [...available, ...sold];
   _origRenderPub();
