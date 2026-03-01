@@ -287,11 +287,20 @@ header::after{
 .ctag.purple{background:rgba(155,89,182,0.1);color:#e056fd;border-color:rgba(155,89,182,0.2)}
 .ctag.cyan{background:rgba(0,212,255,0.08);color:var(--cyan);border-color:rgba(0,212,255,0.2)}
 .cdesc{
-  font-size:.78rem;color:var(--text2);margin-bottom:4px;line-height:1.6;
-  position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:.78rem;color:var(--text2);line-height:1.6;
   word-break:break-word;
+  /* Fixed height with internal scroll */
+  max-height:3.2em; /* 2 lines worth */
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:4px;
+  margin-bottom:8px;
 }
-.cdesc.expanded{display:block;-webkit-line-clamp:unset;max-height:none;overflow:visible}
+/* Thin scrollbar styling */
+.cdesc::-webkit-scrollbar{width:3px}
+.cdesc::-webkit-scrollbar-track{background:transparent}
+.cdesc::-webkit-scrollbar-thumb{background:rgba(79,143,255,0.3);border-radius:3px}
+.cdesc::-webkit-scrollbar-thumb:hover{background:rgba(79,143,255,0.5)}
 .cf{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;flex-wrap:wrap}
 .cprice{
   font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;
@@ -342,12 +351,19 @@ header::after{
   background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold));
   border-radius:12px 12px 0 0;
 }
-.modal-head{padding:28px 24px 0;text-align:center}
+.modal-head{padding:28px 24px 0;text-align:center;position:relative}
 .modal-head h2{
   font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;
   color:var(--gold);margin-bottom:20px;
   filter:drop-shadow(0 0 20px rgba(255,215,0,0.3));
 }
+.modal-close{
+  position:absolute;top:20px;right:20px;background:none;border:none;
+  color:var(--text2);font-size:1.8rem;cursor:pointer;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;transition:all .2s;line-height:1;
+}
+.modal-close:hover{background:rgba(255,60,60,0.1);color:var(--red)}
 .modal-divider{border:none;border-top:1px solid rgba(255,215,0,0.1);margin:0 24px 20px}
 .modal-body{padding:0 24px 24px}
 .modal-field{margin-bottom:14px}
@@ -428,8 +444,9 @@ header::after{
   background:none;border:none;color:var(--blue);font-size:.7rem;
   font-weight:700;cursor:pointer;padding:4px 0;margin:0 0 6px 0;
   font-family:'Space Grotesk',sans-serif;letter-spacing:0.5px;
-  transition:color .2s;display:block;text-align:left;
+  transition:color .2s;display:none;text-align:left;
 }
+.see-more-btn.show{display:block}
 .see-more-btn:hover{color:var(--cyan)}
 @media(max-width:580px){
   .see-more-btn{font-size:.68rem;padding:3px 0}
@@ -1658,11 +1675,10 @@ function renderPub(){
         priceHtml=`<div class="cprice${!item.price?' fp':''}">${pr}</div>`;
       }
       
-      // Description with see more
+      // Description with scrollbar - no button needed
       let descHtml = '';
       if(item.desc){
-        descHtml = `<div class="cdesc" id="desc-${fid}">${esc(item.desc)}</div>`;
-        descHtml += `<button class="see-more-btn" onclick="window._toggleDesc('${fid}')">See More</button>`;
+        descHtml = `<div class="cdesc">${esc(item.desc)}</div>`;
       }
       
       const cta=`<button class="ccta" onclick="window._openOrder('${fid}')">${WASVG} Buy Now</button>`;
@@ -1764,18 +1780,6 @@ function tst(msg,er=false){
 }
 function tFaq(item){const o=item.classList.contains('op');document.querySelectorAll('.fi').forEach(i=>i.classList.remove('op'));if(!o)item.classList.add('op');}
 
-// ── TOGGLE DESCRIPTION ────────────────────────────────
-function toggleDesc(fid){
-  const desc = document.getElementById('desc-' + fid);
-  const btn = event.target;
-  if(desc.classList.contains('expanded')){
-    desc.classList.remove('expanded');
-    btn.textContent = 'See More';
-  } else {
-    desc.classList.add('expanded');
-    btn.textContent = 'See Less';
-  }
-}
 
 // ── TESTIMONIALS CAROUSEL ─────────────────────────────
 let currentTestimonialIndex = 0;
@@ -1864,7 +1868,6 @@ window._openOrder = openOrder;
 window._tgSold    = tgSold;
 window._dlItem    = dlItem;
 window._editItem  = editItem;
-window._toggleDesc= toggleDesc;
 window._moveTestimonial = moveTestimonial;
 
 // ── INIT ──────────────────────────────────────────────
