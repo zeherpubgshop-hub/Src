@@ -2055,12 +2055,25 @@ function cldPoster(url){
 
 // Play video inline on card — stop all others first
 function playCardVideo(e, el){
-  e.stopPropagation(); // don't open detail page
+  e.stopPropagation();
   stopAllCardVideos();
   const player = el.querySelector('.card-video-player');
   const vid    = player.querySelector('video');
   player.classList.add('active');
   vid.play().catch(()=>{});
+
+  // Auto-pause when card scrolls out of view
+  if(window._vidPauseObserver) window._vidPauseObserver.disconnect();
+  window._vidPauseObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting){
+        vid.pause();
+        player.classList.remove('active');
+        window._vidPauseObserver.disconnect();
+      }
+    });
+  },{threshold: 0.1}); // pause when less than 10% visible
+  window._vidPauseObserver.observe(el);
 }
 
 // Stop & reset all inline card videos
