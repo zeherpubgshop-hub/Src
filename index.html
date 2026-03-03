@@ -1163,7 +1163,9 @@ footer a:hover{opacity:1}
 /* ── DETAIL OVERLAY ──────────────────────────────────── */
 .detail-overlay{
   position:fixed;inset:0;z-index:500;
-  background:var(--bg);overflow-y:auto;
+  background:var(--bg);overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.25,.8,.25,1);
 }
 .detail-overlay.open{transform:translateX(0)}
@@ -2388,19 +2390,47 @@ const CURRENCY_SYMBOL={
   'PHP':'₱'
 };
 let _rateCache={};   // { 'USD_INR': rate, ... }
+let _ratesReady=false;
 let _convertedPrice=''; // shown in WA message
 
-async function fetchRate(from,to){
-  if(from===to)return 1;
-  const key=`${from}_${to}`;
-  if(_rateCache[key])return _rateCache[key];
+// Fetch ALL needed rates in one API call on page load
+async function prefetchRates(){
+  const currencies=['INR','USD','GBP','CAD','AUD','AED','SAR','PKR','BDT','NPR','LKR','EUR','SGD','MYR','IDR','PHP'];
   try{
-    const r=await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+    const r=await fetch('https://api.frankfurter.app/latest?from=USD&to='+currencies.join(','));
     const d=await r.json();
-    const rate=d.rates[to];
-    _rateCache[key]=rate;
-    return rate;
-  }catch(e){return null;}
+    // Store USD→X
+    currencies.forEach(c=>{
+      if(d.rates[c]){
+        _rateCache[`USD_${c}`]=d.rates[c];
+        _rateCache[`${c}_USD`]=1/d.rates[c];
+      }
+    });
+    // Cross rates: X→Y = (X→USD) * (USD→Y)
+    currencies.forEach(from=>{
+      currencies.forEach(to=>{
+        if(from!==to&&!_rateCache[`${from}_${to}`]){
+          const toUSD=_rateCache[`${from}_USD`];
+          const toTarget=_rateCache[`USD_${to}`];
+          if(toUSD&&toTarget) _rateCache[`${from}_${to}`]=toUSD*toTarget;
+        }
+      });
+    });
+    _ratesReady=true;
+  }catch(e){
+    _ratesReady=false; // will fall back to live fetch if needed
+  }
+}
+
+function fetchRate(from,to){
+  if(from===to)return Promise.resolve(1);
+  const key=`${from}_${to}`;
+  if(_rateCache[key]) return Promise.resolve(_rateCache[key]);
+  // Fallback: live fetch if prefetch missed this pair
+  return fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`)
+    .then(r=>r.json())
+    .then(d=>{ const rate=d.rates[to]; _rateCache[key]=rate; return rate; })
+    .catch(()=>null);
 }
 
 function parsePriceNum(priceStr){
@@ -2438,8 +2468,7 @@ async function updateModalPrice(){
   const fromCur=detectBaseCurrency(fmtPrice(rawBase));
   const sym=CURRENCY_SYMBOL[toCur]||toCur+' ';
 
-  // Show loading
-  priceEl.textContent='Converting…';
+  // Instant from cache — no loading state needed
   origEl.style.display='none';saleEl.style.display='none';
 
   const rate=await fetchRate(fromCur,toCur);
@@ -2531,7 +2560,9 @@ function openDetail(fid){
   renderDetailPage();
   document.getElementById('detailOverlay').classList.add('open');
   document.body.style.overflow='hidden';
-  window.scrollTo(0,0);
+  document.body.style.position='fixed';
+  document.body.style.top='-'+_savedScrollY+'px';
+  document.body.style.width='100%';
 }
 
 function closeDetail(){
@@ -2542,6 +2573,9 @@ function closeDetail(){
 
   document.getElementById('detailOverlay').classList.remove('open');
   document.body.style.overflow='';
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.width='';
   detailItem=null;
   const url=new URL(location.href);
   url.searchParams.delete('account');
@@ -2997,6 +3031,7 @@ window._shareDetail = ()=>{ if(detailItem) shareAccount(detailItem.firestoreId);
 // ── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   setProgress(10, 'Initializing...');
+  prefetchRates(); // fetch all exchange rates once in background
   document.getElementById('fy').textContent=new Date().getFullYear();
   startLiveListener();
   initTestimonials();
