@@ -2491,7 +2491,8 @@ function closeDetail(){
   const url=new URL(location.href);
   url.searchParams.delete('account');
   history.pushState({},'',url.toString());
-  window.scrollTo(0,_savedScrollY); // restore position
+  // Wait for overflow:'' reflow before restoring scroll
+  requestAnimationFrame(()=>window.scrollTo({top:_savedScrollY,behavior:'instant'}));
 }
 
 function renderDetailPage(){
