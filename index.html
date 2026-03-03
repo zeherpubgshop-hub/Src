@@ -1064,10 +1064,29 @@ footer a:hover{opacity:1}
 .new-card{cursor:pointer;overflow:hidden}
 .new-card:hover{transform:translateY(-5px)}
 .ciw{position:relative}
-.ci-vid-thumb{position:relative;width:100%;aspect-ratio:4/3;background:#050505}
-.ci-vid-thumb .ci-vid{width:100%;height:100%;object-fit:cover;pointer-events:none}
-.vid-play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3)}
-.vid-play-icon svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8))}
+/* ── INLINE VIDEO PLAYER ON CARDS ── */
+.ci-vid-thumb{position:relative;width:100%;aspect-ratio:4/3;background:#050505;cursor:pointer}
+.ci-vid-thumb .ci-vid{width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
+.vid-play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);transition:opacity .2s}
+.vid-play-icon svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8));transition:transform .15s}
+.ci-vid-thumb:hover .vid-play-icon svg{transform:scale(1.12)}
+/* When video is playing, hide the overlay */
+.ci-vid-thumb.playing .vid-play-icon{opacity:0;pointer-events:none}
+.ci-vid-thumb.playing .ci-vid{pointer-events:auto}
+/* Inline expanded video player */
+.card-video-player{
+  position:absolute;inset:0;z-index:20;background:#000;
+  display:none;flex-direction:column;
+}
+.card-video-player.active{display:flex}
+.card-video-player video{width:100%;height:100%;object-fit:contain;background:#000}
+.card-vid-close{
+  position:absolute;top:6px;right:6px;z-index:21;
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:rgba(0,0,0,0.7);color:#fff;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;line-height:1;
+}
 .card-top-left{
   position:absolute;top:10px;left:10px;z-index:10;
   display:flex;align-items:center;gap:6px;
@@ -1991,6 +2010,35 @@ document.addEventListener('click',e=>{
 const CLD_CLOUD  = "dlhskm8vf";
 const CLD_PRESET = "qz6nixcz";
 
+// Generate Cloudinary poster thumbnail from video URL (frame at 0s, JPEG)
+function cldPoster(url){
+  try{
+    return url.replace('/video/upload/','/video/upload/so_0,f_jpg,q_60,w_600/')
+              .replace(/\.[^.]+$/,'.jpg');
+  }catch(e){return '';}
+}
+
+// Play video inline on card — stop all others first
+function playCardVideo(e, el){
+  e.stopPropagation(); // don't open detail page
+  stopAllCardVideos();
+  const player = el.querySelector('.card-video-player');
+  const vid    = player.querySelector('video');
+  player.classList.add('active');
+  vid.play().catch(()=>{});
+}
+
+// Stop & reset all inline card videos
+function stopAllCardVideos(){
+  document.querySelectorAll('.card-video-player.active').forEach(p=>{
+    const v = p.querySelector('video');
+    if(v){v.pause();v.currentTime=0;}
+    p.classList.remove('active');
+  });
+}
+window.playCardVideo   = playCardVideo;
+window.stopAllCardVideos = stopAllCardVideos;
+
 // ── FILE SELECT ───────────────────────────────────────
 function onFileSelect(inp){
   const f=inp.files[0];if(!f)return;
@@ -2425,7 +2473,8 @@ function openDetail(fid){
   detailItem=stock.find(s=>s.firestoreId===fid);
   if(!detailItem)return;
   
-  _savedScrollY=window.scrollY; // save position before hiding
+  _savedScrollY=window.scrollY;
+  stopAllCardVideos(); // stop any playing card videos
 
   const url=new URL(location.href);
   url.searchParams.set('account',fid);
@@ -2599,7 +2648,14 @@ function renderPub(){
       let thumb='<div class="cip">🎮</div>';
       if(item.mediaUrl){
         thumb=item.isVideo
-          ?`<div class="ci-vid-thumb"><video class="ci-vid" src="${item.mediaUrl}" preload="metadata" muted playsinline oncontextmenu="return false"></video><div class="vid-play-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>`
+          ?`<div class="ci-vid-thumb" onclick="window.playCardVideo(event,this)">
+              <video class="ci-vid" src="${item.mediaUrl}" preload="none" muted playsinline poster="${cldPoster(item.mediaUrl)}" oncontextmenu="return false"></video>
+              <div class="vid-play-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="white" opacity=".92"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.45)"/><polygon points="9,7 19,12 9,17" fill="white"/></svg></div>
+              <div class="card-video-player">
+                <video src="${item.mediaUrl}" controls playsinline preload="none" oncontextmenu="return false" onended="this.closest('.card-video-player').classList.remove('active')"></video>
+                <button class="card-vid-close" onclick="event.stopPropagation();this.closest('.card-video-player').classList.remove('active');this.closest('.card-video-player').querySelector('video').pause();">✕</button>
+              </div>
+            </div>`
           :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy" oncontextmenu="return false" draggable="false"/>`;
       }
       // Rank extracted from title (e.g. "Crown · Level 61" → "Crown")
@@ -2945,11 +3001,10 @@ const funnyTitles = [
 
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
-    // User left the tab - show funny title
+    stopAllCardVideos(); // pause any playing card videos
     const randomTitle = funnyTitles[Math.floor(Math.random() * funnyTitles.length)];
     document.title = randomTitle;
   } else {
-    // User came back - restore original
     document.title = originalTitle;
   }
 });
