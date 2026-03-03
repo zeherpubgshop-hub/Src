@@ -154,11 +154,7 @@ header::after{
 .bgh:hover{color:var(--text);border-color:var(--border2);background:rgba(255,215,0,0.05)}
 
 /* ── HERO ── */
-.hero{
-  max-width:1280px;margin:0 auto;
-  padding:64px 20px 48px;
-  position:relative;text-align:center;
-}
+.hero{max-width:1280px;margin:0 auto;padding:28px 20px 16px;position:relative;text-align:center;}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
   background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);
@@ -1011,90 +1007,54 @@ footer a:hover{opacity:1}
 
 
 /* ── ACCOUNT STAT BADGES ─────────────────────────────── */
-.stat-badges{
-  display:flex;flex-wrap:wrap;gap:5px;
-  margin-bottom:10px;
-}
+.stat-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .stat-badge{
   display:inline-flex;align-items:center;gap:4px;
   font-family:'Space Grotesk',sans-serif;font-size:.62rem;font-weight:700;
-  border-radius:4px;padding:3px 8px;letter-spacing:.4px;white-space:nowrap;
-  border:1px solid;
+  border-radius:4px;padding:3px 8px;letter-spacing:.4px;white-space:nowrap;border:1px solid;
 }
-/* Collection Level — purple/mythic */
-.stat-badge.collection{
-  background:rgba(155,89,182,0.12);
-  color:#c77dff;
-  border-color:rgba(155,89,182,0.3);
-}
-/* Account Level — blue */
-.stat-badge.level{
-  background:rgba(79,143,255,0.1);
-  color:var(--blue);
-  border-color:rgba(79,143,255,0.28);
-}
-/* Mythic Car — green */
-.stat-badge.mcar{
-  background:rgba(37,211,102,0.1);
-  color:#25D366;
-  border-color:rgba(37,211,102,0.28);
-}
-/* Mythic Gun — cyan */
-.stat-badge.mgun{
-  background:rgba(0,212,255,0.08);
-  color:var(--cyan);
-  border-color:rgba(0,212,255,0.25);
-}
+.stat-badge.s-lvl   {background:rgba(79,143,255,0.1);  color:var(--blue); border-color:rgba(79,143,255,0.28);}
+.stat-badge.s-col   {background:rgba(155,89,182,0.12); color:#c77dff;     border-color:rgba(155,89,182,0.3);}
+.stat-badge.s-season{background:rgba(255,165,0,0.1);   color:#ffaa33;     border-color:rgba(255,165,0,0.28);}
+.stat-badge.s-myth  {background:rgba(255,60,60,0.1);   color:#ff6b6b;     border-color:rgba(255,60,60,0.28);}
+.stat-badge.s-ult   {background:rgba(0,212,255,0.08);  color:var(--cyan); border-color:rgba(0,212,255,0.25);}
+.stat-badge.s-xsuit {background:rgba(37,211,102,0.1);  color:#25D366;     border-color:rgba(37,211,102,0.28);}
 
-/* In detail page as a grid of specs */
-.dp-specs{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
-  margin-bottom:20px;
-}
+/* Detail page spec cards */
+.dp-specs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
 .dp-spec{
-  background:rgba(79,143,255,0.04);
-  border:1px solid rgba(79,143,255,0.15);
-  border-radius:8px;padding:10px 12px;
-  position:relative;overflow:hidden;
-  transition:border-color .2s,box-shadow .2s,transform .2s;
+  background:rgba(79,143,255,0.04);border:1px solid rgba(79,143,255,0.15);
+  border-radius:8px;padding:10px 12px;position:relative;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
 }
-.dp-spec::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(79,143,255,0.07),transparent 60%);
-  pointer-events:none;
-}
-.dp-spec:hover{transform:translateY(-2px)}
+.dp-spec::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,143,255,0.07),transparent 60%);pointer-events:none;}
+.dp-spec.spec-lvl   {background:rgba(79,143,255,0.06);   border-color:rgba(79,143,255,0.22);}
+.dp-spec.spec-lvl::before   {background:linear-gradient(135deg,rgba(79,143,255,0.1),transparent 60%);}
+.dp-spec.spec-lvl:hover      {border-color:rgba(79,143,255,0.45);box-shadow:0 6px 20px rgba(79,143,255,0.12);}
+.dp-spec.spec-col   {background:rgba(155,89,182,0.06);   border-color:rgba(155,89,182,0.22);}
+.dp-spec.spec-col::before   {background:linear-gradient(135deg,rgba(155,89,182,0.1),transparent 60%);}
+.dp-spec.spec-col:hover      {border-color:rgba(155,89,182,0.4);box-shadow:0 6px 20px rgba(155,89,182,0.12);}
+.dp-spec.spec-season{background:rgba(255,165,0,0.05);    border-color:rgba(255,165,0,0.2);}
+.dp-spec.spec-season::before{background:linear-gradient(135deg,rgba(255,165,0,0.08),transparent 60%);}
+.dp-spec.spec-season:hover   {border-color:rgba(255,165,0,0.4);box-shadow:0 6px 20px rgba(255,165,0,0.1);}
+.dp-spec.spec-myth  {background:rgba(255,60,60,0.05);    border-color:rgba(255,60,60,0.2);}
+.dp-spec.spec-myth::before  {background:linear-gradient(135deg,rgba(255,60,60,0.08),transparent 60%);}
+.dp-spec.spec-myth:hover     {border-color:rgba(255,60,60,0.4);box-shadow:0 6px 20px rgba(255,60,60,0.1);}
+.dp-spec.spec-ult   {background:rgba(0,212,255,0.05);    border-color:rgba(0,212,255,0.2);}
+.dp-spec.spec-ult::before   {background:linear-gradient(135deg,rgba(0,212,255,0.08),transparent 60%);}
+.dp-spec.spec-ult:hover      {border-color:rgba(0,212,255,0.42);box-shadow:0 6px 20px rgba(0,212,255,0.1);}
+.dp-spec.spec-xsuit {background:rgba(37,211,102,0.05);   border-color:rgba(37,211,102,0.2);}
+.dp-spec.spec-xsuit::before {background:linear-gradient(135deg,rgba(37,211,102,0.08),transparent 60%);}
+.dp-spec.spec-xsuit:hover    {border-color:rgba(37,211,102,0.4);box-shadow:0 6px 20px rgba(37,211,102,0.1);}
 
-/* Collection Level — purple */
-.dp-spec.spec-collection{background:rgba(155,89,182,0.06);border-color:rgba(155,89,182,0.22)}
-.dp-spec.spec-collection::before{background:linear-gradient(135deg,rgba(155,89,182,0.1),transparent 60%)}
-.dp-spec.spec-collection:hover{border-color:rgba(155,89,182,0.4);box-shadow:0 6px 20px rgba(155,89,182,0.12)}
-/* Account Level — blue */
-.dp-spec.spec-level{background:rgba(79,143,255,0.06);border-color:rgba(79,143,255,0.22)}
-.dp-spec.spec-level::before{background:linear-gradient(135deg,rgba(79,143,255,0.1),transparent 60%)}
-.dp-spec.spec-level:hover{border-color:rgba(79,143,255,0.45);box-shadow:0 6px 20px rgba(79,143,255,0.12)}
-/* Mythic Car — green */
-.dp-spec.spec-mcar{background:rgba(37,211,102,0.05);border-color:rgba(37,211,102,0.2)}
-.dp-spec.spec-mcar::before{background:linear-gradient(135deg,rgba(37,211,102,0.08),transparent 60%)}
-.dp-spec.spec-mcar:hover{border-color:rgba(37,211,102,0.4);box-shadow:0 6px 20px rgba(37,211,102,0.1)}
-/* Mythic Gun — cyan */
-.dp-spec.spec-mgun{background:rgba(0,212,255,0.05);border-color:rgba(0,212,255,0.2)}
-.dp-spec.spec-mgun::before{background:linear-gradient(135deg,rgba(0,212,255,0.08),transparent 60%)}
-.dp-spec.spec-mgun:hover{border-color:rgba(0,212,255,0.42);box-shadow:0 6px 20px rgba(0,212,255,0.1)}
-
-.dp-spec-label{
-  font-family:'Space Grotesk',sans-serif;font-size:.55rem;
-  font-weight:700;color:var(--text2);letter-spacing:1px;
-  text-transform:uppercase;margin-bottom:5px;
-}
-.dp-spec-value{
-  font-family:'Space Grotesk',sans-serif;font-size:.9rem;
-  font-weight:800;line-height:1.2;
-}
-.dp-spec-value.collection{color:#c77dff}
-.dp-spec-value.level{color:var(--blue)}
-.dp-spec-value.mcar{color:#25D366}
-.dp-spec-value.mgun{color:var(--cyan)}
+.dp-spec-label{font-family:'Space Grotesk',sans-serif;font-size:.55rem;font-weight:700;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.dp-spec-value{font-family:'Space Grotesk',sans-serif;font-size:.9rem;font-weight:800;line-height:1.2;}
+.dp-spec-value.s-lvl   {color:var(--blue);}
+.dp-spec-value.s-col   {color:#c77dff;}
+.dp-spec-value.s-season{color:#ffaa33;}
+.dp-spec-value.s-myth  {color:#ff6b6b;}
+.dp-spec-value.s-ult   {color:var(--cyan);}
+.dp-spec-value.s-xsuit {color:#25D366;}
 
 /* Admin form inline row */
 .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
@@ -1425,34 +1385,11 @@ footer a:hover{color:var(--cyan)}
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-eyebrow">
-      <span>TRUSTED SINCE 2021 (Back When We Were Just Kids With A Dream)</span>
-    </div>
-    
+    <section class="hero">
     <h1>
       PREMIUM PUBG
       <span class="g">MOBILE ACCOUNTS</span>
     </h1>
-    <p class="hsub">37-Day Unlinking Guarantee (longer than most New Year's resolutions) · Verified Ownership · Instant Handover · Government Registered Enterprise (yes, we actually pay taxes)</p>
-
-    <div class="trust-row">
-      <div class="trust-badge"><strong>37-DAY</strong><small>Guarantee</small></div>
-      <div class="trust-badge"><strong>100%</strong><small>Verified</small></div>
-      <div class="trust-badge"><strong>&lt;30 MIN</strong><small>Handover</small></div>
-      <div class="trust-badge"><strong>2021+</strong><small>Trusted</small></div>
-      <div class="trust-badge"><strong>MSME</strong><small>Registered</small></div>
-    </div>
-
-    <div class="hero-ctas">
-      <a class="btn bwa" href="https://wa.me/918982790894?text=Hi%20I'm%20interested%20in%20a%20PUBG%20account" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Chat on WhatsApp
-      </a>
-      <a class="btn btn-gold" href="#sgrid">
-        Browse Accounts (Your wallet will hate us) ↓
-      </a>
-    </div>
   </section>
 
   <!-- FUNNY NOTICE BANNER -->
@@ -1752,22 +1689,32 @@ footer a:hover{color:var(--cyan)}
       <div class="fg"><label class="fl">Discount Price (Optional)</label><input class="fi2" id="f8" type="text" placeholder="e.g. $250 (shows strikethrough on original)"/></div>
       <div class="fg-row">
         <div class="fg" style="margin-bottom:0">
-          <label class="fl">Collection Level <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
-          <input class="fi2" id="f_col" type="text" placeholder="e.g. Mythic, Legendary…"/>
-        </div>
-        <div class="fg" style="margin-bottom:0">
           <label class="fl">Account Level <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
           <input class="fi2" id="f_lvl" type="number" min="1" max="999" placeholder="e.g. 65"/>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">Collection Level <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
+          <input class="fi2" id="f_col" type="text" placeholder="e.g. 120"/>
         </div>
       </div>
       <div class="fg-row">
         <div class="fg" style="margin-bottom:0">
-          <label class="fl">Mythic Car <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
-          <input class="fi2" id="f_mcar" type="text" placeholder="e.g. Lamborghini, Ferrari…"/>
+          <label class="fl">Season / Conqueror <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
+          <input class="fi2" id="f_season" type="text" placeholder="e.g. C4S18 Conqueror"/>
         </div>
         <div class="fg" style="margin-bottom:0">
-          <label class="fl">Mythic Gun <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
-          <input class="fi2" id="f_mgun" type="text" placeholder="e.g. Glacier M416, AKM…"/>
+          <label class="fl">Total Mythic Count <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
+          <input class="fi2" id="f_myth" type="number" min="0" placeholder="e.g. 12"/>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">Total Ultimate Fashion <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
+          <input class="fi2" id="f_ult" type="number" min="0" placeholder="e.g. 5"/>
+        </div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">X-Suits Count <span style="color:var(--text2);font-weight:400">(Optional)</span></label>
+          <input class="fi2" id="f_xsuit" type="text" placeholder="e.g. 3 (Lv.3, Lv.2, Lv.1)"/>
         </div>
       </div>
 
@@ -2154,10 +2101,12 @@ async function submitForm(){
       desc:document.getElementById('f2').value.trim(),
       price:document.getElementById('f3').value.trim(),
       discountPrice:document.getElementById('f8').value.trim(),
-      collectionLevel:document.getElementById('f_col').value||'',
-      accountLevel:document.getElementById('f_lvl').value.trim()||'',
-      mythicCar:document.getElementById('f_mcar').value||'',
-      mythicGun:document.getElementById('f_mgun').value||'',
+      collectionLevel: document.getElementById('f_col').value.trim()||'',
+      accountLevel:    document.getElementById('f_lvl').value.trim()||'',
+      season:          document.getElementById('f_season').value.trim()||'',
+      mythicCount:     document.getElementById('f_myth').value.trim()||'',
+      ultimateCount:   document.getElementById('f_ult').value.trim()||'',
+      xsuitCount:      document.getElementById('f_xsuit').value.trim()||'',
       sold:document.getElementById('f7').checked,
     };
 
@@ -2195,10 +2144,12 @@ function editItem(fid){
   document.getElementById('f2').value=item.desc||'';
   document.getElementById('f3').value=item.price||'';
   document.getElementById('f8').value=item.discountPrice||'';
-  document.getElementById('f_col').value=item.collectionLevel||'';
-  document.getElementById('f_lvl').value=item.accountLevel||'';
-  document.getElementById('f_mcar').value=item.mythicCar||'';
-  document.getElementById('f_mgun').value=item.mythicGun||'';
+  document.getElementById('f_col').value    = item.collectionLevel||'';
+  document.getElementById('f_lvl').value    = item.accountLevel||'';
+  document.getElementById('f_season').value = item.season||'';
+  document.getElementById('f_myth').value   = item.mythicCount||'';
+  document.getElementById('f_ult').value    = item.ultimateCount||'';
+  document.getElementById('f_xsuit').value  = item.xsuitCount||'';
   document.getElementById('f7').checked=!!item.sold;
   // Show existing media
   const imgPre=document.getElementById('imgPre'),vidPre=document.getElementById('vidPre');
@@ -2224,8 +2175,8 @@ function cancelEdit(){
   document.getElementById('cancelEditBtn').style.display='none';
 }
 function clearForm(){
-  ['f1','f2','f3','f8','f_lvl'].forEach(id=>document.getElementById(id).value='');
-  ['f_col','f_mcar','f_mgun'].forEach(id=>document.getElementById(id).value='');
+  ['f1','f2','f3','f8','f_lvl','f_myth','f_ult'].forEach(id=>document.getElementById(id).value='');
+  ['f_col','f_season','f_xsuit'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f5').value='';
   document.getElementById('f7').checked=false;
   document.getElementById('imgPre').style.display='none';
@@ -2441,10 +2392,12 @@ function submitOrder(){
   const priceDisplay=_convertedPrice||fmtPrice(activeItem.discountPrice)||fmtPrice(activeItem.price)||'Contact for Price';
   // Build stats lines for WA message
   const statsLines=[];
-  if(activeItem.collectionLevel) statsLines.push(`🎯 Collection Level: ${activeItem.collectionLevel}`);
   if(activeItem.accountLevel)    statsLines.push(`⚔️ Account Level: ${activeItem.accountLevel}`);
-  if(activeItem.mythicCar)       statsLines.push(`🚗 Mythic Car: ${activeItem.mythicCar}`);
-  if(activeItem.mythicGun)       statsLines.push(`🔫 Mythic Gun: ${activeItem.mythicGun}`);
+  if(activeItem.collectionLevel) statsLines.push(`🎯 Collection Level: ${activeItem.collectionLevel}`);
+  if(activeItem.season)          statsLines.push(`👑 Season/Conqueror: ${activeItem.season}`);
+  if(activeItem.mythicCount)     statsLines.push(`💎 Total Mythic: ${activeItem.mythicCount}`);
+  if(activeItem.ultimateCount)   statsLines.push(`✨ Total Ultimate Fashion: ${activeItem.ultimateCount}`);
+  if(activeItem.xsuitCount)      statsLines.push(`🦾 X-Suits: ${activeItem.xsuitCount}`);
   const accountLink=`${location.protocol}//${location.host}${location.pathname}?account=${activeItem.firestoreId}`;
   const msg=[
     `🎮 *NEW ORDER RECEIVED*`,`--------------------------`,
@@ -2610,21 +2563,25 @@ function fmtPrice(p){if(!p)return null;return(p.startsWith('$')||p.startsWith('�
 
 // Build compact stat badges (for cards and checkout preview)
 function buildStatBadges(item){
-  const stats=[];
-  if(item.collectionLevel) stats.push(`<span class="stat-badge collection">🎯 ${esc(item.collectionLevel)}</span>`);
-  if(item.accountLevel)    stats.push(`<span class="stat-badge level">⚔️ Lvl ${esc(item.accountLevel)}</span>`);
-  if(item.mythicCar)       stats.push(`<span class="stat-badge mcar">🚗 ${esc(item.mythicCar)}</span>`);
-  if(item.mythicGun)       stats.push(`<span class="stat-badge mgun">🔫 ${esc(item.mythicGun)}</span>`);
-  return stats.length?`<div class="stat-badges">${stats.join('')}</div>`:'';
+  const s=[];
+  if(item.accountLevel)    s.push(`<span class="stat-badge s-lvl">⚔️ Lvl ${esc(item.accountLevel)}</span>`);
+  if(item.collectionLevel) s.push(`<span class="stat-badge s-col">🎯 CL ${esc(item.collectionLevel)}</span>`);
+  if(item.season)          s.push(`<span class="stat-badge s-season">👑 ${esc(item.season)}</span>`);
+  if(item.mythicCount)     s.push(`<span class="stat-badge s-myth">💎 ${esc(item.mythicCount)} Mythic</span>`);
+  if(item.ultimateCount)   s.push(`<span class="stat-badge s-ult">✨ ${esc(item.ultimateCount)} Ultimate</span>`);
+  if(item.xsuitCount)      s.push(`<span class="stat-badge s-xsuit">🦾 ${esc(item.xsuitCount)} X-Suit</span>`);
+  return s.length?`<div class="stat-badges">${s.join('')}</div>`:'';
 }
 
 // Build detail-page stat spec grid
 function buildStatCards(item){
   const specs=[];
-  if(item.collectionLevel) specs.push(`<div class="dp-spec spec-collection"><div class="dp-spec-label">Collection Level</div><div class="dp-spec-value collection">🎯 ${esc(item.collectionLevel)}</div></div>`);
-  if(item.accountLevel)    specs.push(`<div class="dp-spec spec-level"><div class="dp-spec-label">Account Level</div><div class="dp-spec-value level">⚔️ Level ${esc(item.accountLevel)}</div></div>`);
-  if(item.mythicCar)       specs.push(`<div class="dp-spec spec-mcar"><div class="dp-spec-label">Mythic Car</div><div class="dp-spec-value mcar">🚗 ${esc(item.mythicCar)}</div></div>`);
-  if(item.mythicGun)       specs.push(`<div class="dp-spec spec-mgun"><div class="dp-spec-label">Mythic Gun</div><div class="dp-spec-value mgun">🔫 ${esc(item.mythicGun)}</div></div>`);
+  if(item.accountLevel)    specs.push(`<div class="dp-spec spec-lvl"><div class="dp-spec-label">Account Level</div><div class="dp-spec-value s-lvl">⚔️ Level ${esc(item.accountLevel)}</div></div>`);
+  if(item.collectionLevel) specs.push(`<div class="dp-spec spec-col"><div class="dp-spec-label">Collection Level</div><div class="dp-spec-value s-col">🎯 ${esc(item.collectionLevel)}</div></div>`);
+  if(item.season)          specs.push(`<div class="dp-spec spec-season"><div class="dp-spec-label">Season / Conqueror</div><div class="dp-spec-value s-season">👑 ${esc(item.season)}</div></div>`);
+  if(item.mythicCount)     specs.push(`<div class="dp-spec spec-myth"><div class="dp-spec-label">Total Mythic Count</div><div class="dp-spec-value s-myth">💎 ${esc(item.mythicCount)}</div></div>`);
+  if(item.ultimateCount)   specs.push(`<div class="dp-spec spec-ult"><div class="dp-spec-label">Total Ultimate Fashion</div><div class="dp-spec-value s-ult">✨ ${esc(item.ultimateCount)}</div></div>`);
+  if(item.xsuitCount)      specs.push(`<div class="dp-spec spec-xsuit"><div class="dp-spec-label">X-Suits</div><div class="dp-spec-value s-xsuit">🦾 ${esc(item.xsuitCount)}</div></div>`);
   return specs.length?`<div class="dp-specs">${specs.join('')}</div>`:'';
 }
 function renderPub(){
