@@ -110,9 +110,10 @@ body::after{
   -webkit-background-clip:text;background-clip:text;color:transparent;
   text-shadow:none;filter:drop-shadow(0 0 30px rgba(255,215,0,0.4))
 }
-.ls-bar{width:200px;height:2px;background:rgba(255,215,0,0.1);border-radius:2px;overflow:hidden}
-.ls-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;animation:lsfill 0.8s ease-in-out infinite}
-@keyframes lsfill{0%{width:0%;margin-left:0}50%{width:80%}100%{width:0%;margin-left:100%}}
+.ls-bar{width:220px;height:3px;background:rgba(79,143,255,0.12);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.ls-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--cyan));border-radius:3px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+.ls-bottom{display:flex;align-items:center;justify-content:space-between;width:220px;gap:8px}
+.ls-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--cyan);letter-spacing:1px;min-width:32px;text-align:right}
 .ls-text{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text2);letter-spacing:2px;animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
@@ -1064,7 +1065,17 @@ footer a:hover{opacity:1}
 .new-card{cursor:pointer;overflow:hidden}
 .new-card:hover{transform:translateY(-5px)}
 .ciw{position:relative}
-/* ── INLINE VIDEO PLAYER ON CARDS ── */
+/* ── LAZY LOAD ── */
+.lazy-media{opacity:0;transition:opacity .35s ease}
+.lazy-media.loaded{opacity:1}
+.ciw .lazy-shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(255,255,255,0.03) 0%,rgba(255,255,255,0.07) 50%,rgba(255,255,255,0.03) 100%);
+  background-size:200% 100%;
+  animation:shimmer .9s infinite linear;
+  border-radius:inherit;pointer-events:none;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .ci-vid-thumb{position:relative;width:100%;aspect-ratio:4/3;background:#050505;cursor:pointer}
 .ci-vid-thumb .ci-vid{width:100%;height:100%;object-fit:cover;pointer-events:none;display:block}
 .vid-play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);transition:opacity .2s}
@@ -1312,8 +1323,11 @@ footer a:hover{color:var(--cyan)}
 <!-- LOADING -->
 <div id="loading-screen">
   <div class="ls-logo">ZEHER STORE</div>
-  <div class="ls-bar"><div class="ls-fill"></div></div>
-  <div class="ls-text">LOADING... (Pretending to work hard)</div>
+  <div class="ls-bar"><div class="ls-fill" id="ls-fill"></div></div>
+  <div class="ls-bottom">
+    <div class="ls-text" id="ls-text">Connecting...</div>
+    <div class="ls-pct" id="ls-pct">0%</div>
+  </div>
 </div>
 
 <!-- DETAIL PAGE OVERLAY -->
@@ -1869,21 +1883,42 @@ function setFbStatus(state){
   lb.textContent=state==='ok'?'FIREBASE ✓':state==='err'?'FIREBASE ✗':'FIREBASE...';
 }
 
-// ── LOADING SCREEN ────────────────────────────────────
+// ── LOADING SCREEN PROGRESS ───────────────────────────
+const _lsFill = ()=>document.getElementById('ls-fill');
+const _lsPct  = ()=>document.getElementById('ls-pct');
+const _lsTxt  = ()=>document.getElementById('ls-text');
+let _lsCurrent = 0;
+
+function setProgress(pct, label){
+  _lsCurrent = Math.max(_lsCurrent, Math.min(pct, 100));
+  const fill = _lsFill(); const pctEl = _lsPct(); const txt = _lsTxt();
+  if(fill)  fill.style.width = _lsCurrent + '%';
+  if(pctEl) pctEl.textContent = _lsCurrent + '%';
+  if(txt && label) txt.textContent = label;
+}
+
 function hideLoading(){
-  const ls=document.getElementById('loading-screen');
-  ls.style.transition="opacity .15s";ls.style.opacity='0';
-  setTimeout(()=>ls.style.display='none',500);
+  setProgress(100, 'Ready!');
+  const ls = document.getElementById('loading-screen');
+  setTimeout(()=>{
+    ls.style.transition = 'opacity .3s';
+    ls.style.opacity = '0';
+    setTimeout(()=>{ ls.style.display='none'; }, 300);
+  }, 250); // brief pause at 100% so user sees it complete
 }
 
 // ── REAL-TIME LISTENER ────────────────────────────────
 function startLiveListener(){
+  setProgress(20, 'Connecting to Firebase...');
   const q=query(collection(db,COL),orderBy("addedAt","asc"));
   let firstSnap=true;
+  setProgress(45, 'Fetching accounts...');
   onSnapshot(q,
     snap=>{
+      setProgress(75, 'Loading accounts...');
       stock=snap.docs.map(d=>({firestoreId:d.id,...d.data()}));
       setFbStatus('ok');
+      setProgress(90, 'Rendering...');
       renderPub();
       if(loggedIn) renderAdm();
       if(firstSnap){firstSnap=false;hideLoading();onHash();}
@@ -1894,8 +1929,8 @@ function startLiveListener(){
       if(firstSnap){firstSnap=false;hideLoading();onHash();}
     }
   );
-  // Safety fallback: show site after 5s even if Firebase slow
-  setTimeout(()=>{if(firstSnap){firstSnap=false;hideLoading();onHash();}},500);
+  // Hard fallback — never get stuck forever
+  setTimeout(()=>{if(firstSnap){firstSnap=false;hideLoading();onHash();}},8000);
 }
 
 // ── VIEWS ─────────────────────────────────────────────
@@ -2607,6 +2642,45 @@ window.addEventListener('popstate',e=>{
   }
 });
 
+// ── LAZY MEDIA LOADER ─────────────────────────────────
+let _lazyObserver = null;
+function initLazyMedia(){
+  // Disconnect previous observer if re-rendering
+  if(_lazyObserver) _lazyObserver.disconnect();
+
+  _lazyObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      const el = entry.target;
+
+      if(el.tagName === 'IMG'){
+        el.src = el.dataset.src;
+        el.onload  = ()=>{ el.classList.add('loaded'); removeShimmer(el); };
+        el.onerror = ()=>{ el.classList.add('loaded'); removeShimmer(el); };
+      } else if(el.tagName === 'VIDEO'){
+        if(el.dataset.poster) el.poster = el.dataset.poster;
+        el.src = el.dataset.src;
+        el.load();
+        el.classList.add('loaded');
+        removeShimmer(el);
+      }
+      _lazyObserver.unobserve(el);
+    });
+  },{
+    rootMargin: '200px 0px', // start loading 200px before entering viewport
+    threshold: 0
+  });
+
+  document.querySelectorAll('.lazy-media[data-src]').forEach(el=>{
+    _lazyObserver.observe(el);
+  });
+}
+
+function removeShimmer(el){
+  const shimmer = el.closest('.ciw, .ci-vid-thumb')?.querySelector('.lazy-shimmer');
+  if(shimmer) shimmer.style.display='none';
+}
+
 // ── PUBLIC RENDER ─────────────────────────────────────
 function fmtPrice(p){if(!p)return null;return(p.startsWith('$')||p.startsWith('₹')||p.toLowerCase().includes('contact'))?p:'$'+p;}
 
@@ -2649,14 +2723,15 @@ function renderPub(){
       if(item.mediaUrl){
         thumb=item.isVideo
           ?`<div class="ci-vid-thumb" onclick="window.playCardVideo(event,this)">
-              <video class="ci-vid" src="${item.mediaUrl}" preload="none" muted playsinline poster="${cldPoster(item.mediaUrl)}" oncontextmenu="return false"></video>
+              <video class="ci-vid lazy-media" data-src="${item.mediaUrl}" data-poster="${cldPoster(item.mediaUrl)}" preload="none" muted playsinline oncontextmenu="return false"></video>
+              <div class="lazy-shimmer"></div>
               <div class="vid-play-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="white" opacity=".92"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.45)"/><polygon points="9,7 19,12 9,17" fill="white"/></svg></div>
               <div class="card-video-player">
                 <video src="${item.mediaUrl}" controls playsinline preload="none" oncontextmenu="return false" onended="this.closest('.card-video-player').classList.remove('active')"></video>
                 <button class="card-vid-close" onclick="event.stopPropagation();this.closest('.card-video-player').classList.remove('active');this.closest('.card-video-player').querySelector('video').pause();">✕</button>
               </div>
             </div>`
-          :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy" oncontextmenu="return false" draggable="false"/>`;
+          :`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="${esc(item.title)}" oncontextmenu="return false" draggable="false"/>`;
       }
       // Rank extracted from title (e.g. "Crown · Level 61" → "Crown")
       const rankPart=item.title.split('·')[0].trim();
@@ -2714,14 +2789,15 @@ function renderPub(){
       let thumb='<div class="cip">🎮</div>';
       if(item.mediaUrl){
         thumb=item.isVideo
-          ?`<video class="ci-vid" src="${item.mediaUrl}" preload="metadata" muted playsinline></video>`
-          :`<img class="ci" src="${item.mediaUrl}" alt="${esc(item.title)}" loading="lazy"/>`;
+          ?`<video class="ci-vid lazy-media" data-src="${item.mediaUrl}" data-poster="${cldPoster(item.mediaUrl)}" preload="none" muted playsinline></video>`
+          :`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="${esc(item.title)}"/>`;
       }
       const WA_LINK='https://wa.me/918982790894?text=Is%20anyone%20available%20to%20chat%3F';
       return `<div class="sc sold"><div class="ciw">${thumb}<div class="sold-stamp"><div class="stamp-label"></div></div></div><div class="cb sold-cb"><div class="sold-title">${esc(item.title)}</div><div class="sold-actions"><span class="sold-tag">SOLD</span><a class="sold-contact" href="${WA_LINK}" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Contact</a></div></div></div>`;
     }).join('');
   }
   g.innerHTML=html;
+  initLazyMedia();
   checkAccountUrl();
 }
 function filt(f,el){cf=f;document.querySelectorAll('.ft').forEach(t=>t.classList.remove('on'));el.classList.add('on');renderPub();}
@@ -2893,6 +2969,7 @@ window._shareDetail = ()=>{ if(detailItem) shareAccount(detailItem.firestoreId);
 
 // ── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
+  setProgress(10, 'Initializing...');
   document.getElementById('fy').textContent=new Date().getFullYear();
   startLiveListener();
   initTestimonials();
