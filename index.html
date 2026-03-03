@@ -2535,13 +2535,17 @@ function openDetail(fid){
 }
 
 function closeDetail(){
+  // Pause detail video if playing
+  const dpVid = document.querySelector('.dp-video');
+  if(dpVid) { dpVid.pause(); }
+  if(window._dpVidObserver){ window._dpVidObserver.disconnect(); window._dpVidObserver=null; }
+
   document.getElementById('detailOverlay').classList.remove('open');
   document.body.style.overflow='';
   detailItem=null;
   const url=new URL(location.href);
   url.searchParams.delete('account');
   history.pushState({},'',url.toString());
-  // Wait for overflow:'' reflow before restoring scroll
   requestAnimationFrame(()=>window.scrollTo({top:_savedScrollY,behavior:'instant'}));
 }
 
@@ -2611,6 +2615,16 @@ function renderDetailPage(){
       </div>
     </div>
   `;
+
+  // Auto-pause detail video when scrolled out of view
+  if(window._dpVidObserver){ window._dpVidObserver.disconnect(); window._dpVidObserver=null; }
+  const dpVid = document.querySelector('.dp-video');
+  if(dpVid){
+    window._dpVidObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{ if(!entry.isIntersecting) dpVid.pause(); });
+    },{threshold: 0.1});
+    window._dpVidObserver.observe(dpVid);
+  }
 }
 
 function shareAccount(fid){
