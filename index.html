@@ -2031,15 +2031,15 @@ document.addEventListener('click',e=>{
   }
 });
 
-// ── CLOUDINARY CONFIG (free, no billing needed) ──────
-const CLD_CLOUD  = "dlhskm8vf";
-const CLD_PRESET = "qz6nixcz";
+// ── IMAGEKIT CONFIG ──────────────────────────────────
+const IK_URL_ENDPOINT = "https://ik.imagekit.io/sdgbfaagg";
+const IK_PRIVATE_KEY  = "private_KsnftcY3c0iG9JuFmOvLOMjV92U=";
 
-// Generate Cloudinary poster thumbnail from video URL (frame at 0s, JPEG)
+// Generate ImageKit poster thumbnail from video URL (frame at 0s, JPEG)
 function cldPoster(url){
   try{
-    return url.replace('/video/upload/','/video/upload/so_0,f_jpg,q_60,w_600/')
-              .replace(/\.[^.]+$/,'.jpg');
+    // ImageKit video thumbnail: append /ik-thumbnail.jpg
+    return url + '/ik-thumbnail.jpg';
   }catch(e){return '';}
 }
 
@@ -2126,15 +2126,16 @@ function uploadFile(file){
       img.src=objUrl;
 
     } else {
-      // ── VIDEO: upload to Cloudinary via XMLHttpRequest (gives real progress %) ──
-      progLabel.textContent='Uploading video to Cloudinary... (This better be worth the wait)';
+      // ── VIDEO: upload to ImageKit via XMLHttpRequest (gives real progress %) ──
+      progLabel.textContent='Uploading video... (This better be worth the wait)';
       const fd=new FormData();
       fd.append('file', file);
-      fd.append('upload_preset', CLD_PRESET);
-      fd.append('resource_type', 'video');
+      fd.append('fileName', 'video_' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));
 
       const xhr=new XMLHttpRequest();
-      xhr.open('POST',`https://api.cloudinary.com/v1_1/${CLD_CLOUD}/video/upload`);
+      xhr.open('POST', 'https://upload.imagekit.io/api/v1/files/upload');
+      // Basic auth: private key as username, empty password
+      xhr.setRequestHeader('Authorization', 'Basic ' + btoa(IK_PRIVATE_KEY + ':'));
 
       xhr.upload.onprogress=e=>{
         if(e.lengthComputable){
@@ -2151,10 +2152,10 @@ function uploadFile(file){
           progFill.style.width='100%';
           progLabel.textContent='Video uploaded ✓ (That was painless, right?)';
           setTimeout(()=>{progWrap.style.display='none';},700);
-          resolve({url:res.secure_url, isVideo:true});
+          resolve({url:res.url, isVideo:true});
         } else {
           progWrap.style.display='none';
-          reject(new Error('Cloudinary error: '+xhr.status));
+          reject(new Error('ImageKit error: '+xhr.status+' '+xhr.responseText));
         }
       };
       xhr.onerror=()=>{progWrap.style.display='none';reject(new Error('Network error during upload'));};
