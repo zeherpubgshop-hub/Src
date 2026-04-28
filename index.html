@@ -877,7 +877,7 @@ function zvpFmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+(s%60<10?'0':'
 function zvpFmtSpeed(b){if(b>1048576)return(b/1048576).toFixed(1)+' MB/s';if(b>1024)return(b/1024).toFixed(0)+' KB/s';return b+'B/s';}
 
 // ── FIREBASE LISTENER ───────────────────────────────
-const q = query(collection(db,COL), orderBy("addedAt","desc"));
+const q = query(collection(db,COL));
 onSnapshot(q, snap => {
   stock = snap.docs.map(d=>({firestoreId:d.id,...d.data()}));
   renderGrid();
@@ -932,7 +932,7 @@ function renderGrid(){
   const sold  = items.filter(i=>i.sold);
   if(sort==='price-asc') avail.sort((a,b)=>parseFloat((a.discountPrice||a.price||'0').toString().replace(/[^\d.]/g,''))-parseFloat((b.discountPrice||b.price||'0').toString().replace(/[^\d.]/g,'')));
   if(sort==='price-desc') avail.sort((a,b)=>parseFloat((b.discountPrice||b.price||'0').toString().replace(/[^\d.]/g,''))-parseFloat((a.discountPrice||a.price||'0').toString().replace(/[^\d.]/g,'')));
-  // Firebase already returns newest first (desc), only re-sort for other options
+  if(sort==='newest') avail.sort((a,b)=>(b.addedAt||0)-(a.addedAt||0));
   const all = [...avail,...sold];
   if(!all.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text2);font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:1px">NO ACCOUNTS FOUND</div>`;return;}
   grid.innerHTML = all.map(item=>buildCard(item)).join('');
@@ -1352,9 +1352,18 @@ window.zvpFullscreen=function(wrap){const v=wrap.querySelector('video');if(!v)re
 let _adminUnlocked = false;
 
 // Check URL for admin
-if(location.hash === '#admin-zeher' || location.hash === '#admin' || location.search.includes('admin=1')){
-  showAdminLogin();
-}
+// Admin check - runs after DOM ready
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(location.hash === '#admin-zeher' || location.hash === '#admin' || location.search.includes('admin=1')){
+    showAdminLogin();
+  }
+});
+// Also listen for hash change
+window.addEventListener('hashchange', ()=>{
+  if(location.hash === '#admin-zeher' || location.hash === '#admin'){
+    showAdminLogin();
+  }
+});
 
 function showAdminLogin(){
   document.getElementById('publicView').style.display='none';
@@ -1377,11 +1386,13 @@ window.doLogin=function(){
   const pass=document.getElementById('adminPass').value;
   if(pass===ADMIN_PASSWORD){
     document.getElementById('loginView')?.remove();
+    document.getElementById('publicView').style.display='none';
     document.getElementById('adminView').style.display='block';
     _adminMode=true;window._adminMode=true;
     renderAdminList();updateStats();
   } else {
-    document.getElementById('loginErr').style.display='block';
+    const err=document.getElementById('loginErr');
+    if(err) err.style.display='block';
   }
 };
 
