@@ -1644,17 +1644,38 @@ window.stopAllCardVideos = stopAllCardVideos;
 // ── FILE SELECT ───────────────────────────────────────
 function onFileSelect(inp){
   const f=inp.files[0];if(!f)return;
-  pendingFile=f;
-  const imgPre=document.getElementById('imgPre'),vidPre=document.getElementById('vidPre');
+  const imgPre=document.getElementById('imgPre');
+  const vidPre=document.getElementById('vidPre');
+  const progWrap=document.getElementById('progWrap');
+
   if(f.type.startsWith('image/')){
+    pendingFile=f;
     const r=new FileReader();
-    r.onload=ev=>{imgPre.src=ev.target.result;imgPre.style.display='block';vidPre.style.display='none';vidPre.src='';};
+    r.onload=ev=>{
+      imgPre.innerHTML='<img src="'+ev.target.result+'" style="width:100%;max-height:180px;object-fit:contain;display:block;border-radius:6px"/>';
+      imgPre.style.display='block';
+      vidPre.innerHTML='';vidPre.style.display='none';
+    };
     r.readAsDataURL(f);
+
   } else if(f.type.startsWith('video/')){
-    // Show local preview while upload happens later
-    vidPre.src=URL.createObjectURL(f);
+    // Show local preview immediately
+    const objUrl=URL.createObjectURL(f);
+    vidPre.innerHTML='<video src="'+objUrl+'" controls muted playsinline style="width:100%;max-height:180px;display:block;background:#000;border-radius:6px"></video>';
     vidPre.style.display='block';
-    imgPre.style.display='none';imgPre.src='';
+    imgPre.innerHTML='';imgPre.style.display='none';
+
+    // Upload immediately — dont wait for Save button
+    pendingFile=null; // clear so submitForm doesnt re-upload
+    uploadFile(f).then(result=>{
+      window._uploadedResult=result;
+      if(window.initThumbSelector) window.initThumbSelector(result.url, result.duration||0);
+      const ta=document.getElementById('thumb-upload-area');
+      if(ta) ta.style.display='';
+    }).catch(e=>{
+      tst('Upload failed: '+e.message, true);
+      pendingFile=f; // fallback — try again on save
+    });
   }
 }
 
@@ -1740,14 +1761,20 @@ async function submitForm(){
   try{
     let mediaUrl=null, isVideo=false;
 
-    // If new file selected, upload it
-    if(pendingFile){
+    // Use pre-uploaded result (video auto-uploaded on select) or upload now
+    if(window._uploadedResult){
+      mediaUrl=window._uploadedResult.url;
+      isVideo=window._uploadedResult.isVideo;
+      window._uploadedResult=null;
+    } else if(pendingFile){
       const result=await uploadFile(pendingFile);
       mediaUrl=result.url;
       isVideo=result.isVideo;
+      pendingFile=null;
     }
 
     const data={
+      title:document.getElementById('f1')?.value.trim()||'',
       desc:document.getElementById('f2').value.trim(),
       price:document.getElementById('f3').value.trim(),
       discountPrice:document.getElementById('f8').value.trim(),
@@ -1857,7 +1884,7 @@ function editItem(fid){
   setTimeout(()=>document.getElementById('f3').focus(),500);
 }
 function cancelEdit(){
-  editingId=null;pendingFile=null;
+  editingId=null;pendingFile=null;window._uploadedResult=null;
   clearForm();
   document.getElementById('form-title-label').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD NEW ACCOUNT<span class="apt-mode adding" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">ADDING</span>';
   document.getElementById('uplBtnTxt').textContent='ADD ACCOUNT';
