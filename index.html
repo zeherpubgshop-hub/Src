@@ -2007,14 +2007,7 @@ function clearForm(){
 // ── FIREBASE CRUD ─────────────────────────────────────
 async function tgSold(fid){
   const item=stock.find(s=>s.firestoreId===fid);if(!item)return;
-  const markingSold = !item.sold;
-  try{
-    // When marking sold, also remove from featured
-    const update = {sold: markingSold};
-    if(markingSold && item.featured) update.featured = false;
-    await updateDoc(doc(db,COL,fid), update);
-    tst(markingSold ? 'Marked Sold — removed from featured' : 'Marked Available');
-  }
+  try{await updateDoc(doc(db,COL,fid),{sold:!item.sold});tst(item.sold?'Marked Available':'Marked Sold');}
   catch(e){tst('Error: '+e.message,true);}
 }
 async function dlItem(fid){
