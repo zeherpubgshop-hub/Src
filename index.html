@@ -2007,7 +2007,14 @@ function clearForm(){
 // ── FIREBASE CRUD ─────────────────────────────────────
 async function tgSold(fid){
   const item=stock.find(s=>s.firestoreId===fid);if(!item)return;
-  try{await updateDoc(doc(db,COL,fid),{sold:!item.sold});tst(item.sold?'Marked Available':'Marked Sold');}
+  const markingSold = !item.sold;
+  try{
+    // When marking sold, also remove from featured
+    const update = {sold: markingSold};
+    if(markingSold && item.featured) update.featured = false;
+    await updateDoc(doc(db,COL,fid), update);
+    tst(markingSold ? 'Marked Sold — removed from featured' : 'Marked Available');
+  }
   catch(e){tst('Error: '+e.message,true);}
 }
 async function dlItem(fid){
@@ -2708,7 +2715,7 @@ let _heroItems = [];
 let _heroTimer = null;
 
 function renderFeatured(){
-  _heroItems = stock.filter(s => s.featured && s.mediaUrl);
+  _heroItems = stock.filter(s => s.featured && s.mediaUrl && !s.sold);
   const track   = document.getElementById('heroSliderTrack');
   const dots    = document.getElementById('heroSliderDots');
   const empty   = document.getElementById('heroSliderEmpty');
@@ -2734,7 +2741,10 @@ function renderFeatured(){
     const media = item.isVideo
       ? `<video src="${item.mediaUrl}" muted playsinline preload="metadata" loop></video>`
       : `<img src="${item.mediaUrl}" alt="" loading="lazy"/>`;
-    return `<div class="hero-slide" onclick="window.openDetail('${item.firestoreId}')">${media}<div class="hero-slide-overlay"></div></div>`;
+    const soldBadge = item.sold ? '<div style="position:absolute;top:10px;left:10px;background:rgba(239,68,68,.85);color:#fff;font-family:\'Barlow Condensed\',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:1.5px;padding:3px 10px;border-radius:5px;z-index:10">SOLD</div>' : '';
+    const clickHandler = item.sold ? '' : `onclick="window.openDetail('${item.firestoreId}')"`;
+    const cursor = item.sold ? 'style="cursor:default"' : '';
+    return `<div class="hero-slide" ${clickHandler} ${cursor}>${media}${soldBadge}<div class="hero-slide-overlay"></div></div>`;
   }).join('');
 
   if(dots){
@@ -2799,6 +2809,10 @@ function _heroRestartAuto(){ _heroStopAuto(); _heroStartAuto(); }
 async function tgFeatured(fid){
   const item = stock.find(s => s.firestoreId === fid);
   if(!item) return;
+  if(item.sold && !item.featured){
+    tst('Cannot feature a sold account', true);
+    return;
+  }
   try{
     await updateDoc(doc(db, COL, fid), {featured: !item.featured});
     tst(item.featured ? 'Removed from featured' : '⭐ Added to featured!');
