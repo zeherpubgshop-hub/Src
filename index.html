@@ -3598,6 +3598,16 @@ document.addEventListener('keydown', e => {
   observeCards();
 })();
 
+window._deleteProof = async function(id){
+  if(!confirm('Delete this proof?')) return;
+  try{
+    await deleteDoc(doc(db, PROOFS_COL, id));
+    tst('Proof deleted');
+  } catch(e){
+    tst('Error: '+e.message, true);
+  }
+};
+
 window._adminToggle = function(tab){
   const sp = document.getElementById('adminStockPanel');
   const pp = document.getElementById('adminProofPanel');
