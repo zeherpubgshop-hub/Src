@@ -3411,6 +3411,17 @@ window._uploadProofs = async function(){
   const setBtn = (txt)=>{ const b=document.getElementById('proofUploadBtn'); if(b) b.textContent=txt; };
   setBtn('Uploading...');
 
+  // Wait for Firebase auth — max 8 seconds
+  if(!authReady){
+    setBtn('Connecting...');
+    try{ await signInAnonymously(auth); }catch(e){}
+    for(let t=0;t<16;t++){
+      if(authReady) break;
+      await new Promise(r=>setTimeout(r,500));
+    }
+  }
+  if(!authReady){ tst('Firebase not ready. Try again.',true); _proofUploading=false; _renderProofPreviews(); return; }
+
   let done = 0;
   for(let i=0; i<filesToUpload.length; i++){
     const file = filesToUpload[i];
