@@ -1775,6 +1775,39 @@ function _friendlyError(raw){
   return raw;
 }
 
+// ── Poll server until video processing is complete ──
+function _pollJob(jobId, duration, progFill, progLabel, progWrap, resolve, reject){
+  const STATUS_URL = VPS_UPLOAD_URL.replace('/upload', '/status/'+jobId);
+  let dots = 0;
+  const interval = setInterval(async()=>{
+    if(_uploadCancelled){ clearInterval(interval); return; }
+    try{
+      dots = (dots+1)%4;
+      progLabel.textContent = 'Processing video'+'.'.repeat(dots+1);
+      const resp = await fetch(STATUS_URL, {headers:{'X-Secret':VPS_SECRET}});
+      const job = await resp.json();
+      if(job.status==='ready'){
+        clearInterval(interval);
+        progFill.style.width='100%';
+        progLabel.textContent='Video ready ✓ — Pick a thumbnail below';
+        setTimeout(()=>{ progWrap.style.display='none'; },700);
+        // Now update thumb selector with the real VPS URL
+        if(window.initThumbSelector){
+          window.initThumbSelector(job.url, job.duration||duration, false);
+        }
+        resolve({url:job.url, isVideo:true});
+      } else if(job.status==='error'){
+        clearInterval(interval);
+        progWrap.style.display='none';
+        reject(new Error('Processing failed: '+job.error));
+      }
+    }catch(e){
+      // Network hiccup — keep polling
+      console.warn('[poll] fetch error, retrying:', e.message);
+    }
+  }, 2000); // poll every 2 seconds
+}
+
 window.startVideoUpload=function(){
   if(!pendingFile||!pendingFile.type.startsWith('video/')){tst('Select a video first',true);return;}
   _lastPendingFile=pendingFile;
@@ -1945,12 +1978,25 @@ function uploadFile(file){
                 if(xhr.status===200){
                   try{
                     const r=JSON.parse(xhr.responseText);
-                    if(r.status==='done'){
-                      // Last chunk — server merged and responded
+                    if(r.status==='processing'){
+                      // All chunks merged — server is applying faststart in background
+                      // Open thumb selector immediately with local blob while we poll
+                      progFill.style.width='98%';
+                      progLabel.textContent='Processing video...';
+                      // Init thumb selector with local file immediately — no waiting
+                      if(window.initThumbSelector && _lastPendingFile){
+                        const blobUrl=URL.createObjectURL(_lastPendingFile);
+                        window.initThumbSelector(blobUrl, r.duration||0, true);
+                        const ta=document.getElementById('thumb-upload-area');
+                        if(ta) ta.style.display='';
+                      }
+                      // Poll /status/:jobId until ready
+                      _pollJob(r.jobId, r.duration||0, progFill, progLabel, progWrap, resolve, reject);
+                      res({_done:false, _processing:true});
+                    } else if(r.status==='done'){
                       progFill.style.width='100%';
-                      progLabel.textContent='Video uploaded ✓ — Slide below to pick thumbnail';
+                      progLabel.textContent='Video ready ✓';
                       setTimeout(()=>{ progWrap.style.display='none'; },700);
-                      if(window.initThumbSelector) window.initThumbSelector(r.url, r.duration||0);
                       resolve({url:r.url, isVideo:true, _done:true});
                     } else {
                       uploadedPerChunk[index]=chunkSize;
@@ -1971,9 +2017,9 @@ function uploadFile(file){
 
           // ── Step 3: sliding window upload (always PARALLEL in-flight) ──
           await new Promise((winResolve, winReject)=>{
-            let nextChunk=0;       // next chunk index to start
-            let inFlight=0;        // currently uploading
-            let finished=false;    // done flag
+            let nextChunk=0;
+            let inFlight=0;
+            let finished=false;
 
             function startNext(){
               while(inFlight < PARALLEL && nextChunk < totalChunks && !finished && !_uploadCancelled){
@@ -1983,8 +2029,9 @@ function uploadFile(file){
                   inFlight--;
                   if(finished) return;
                   if(r&&r._done){ finished=true; resolve({url:r.url,isVideo:true}); winResolve(); return; }
-                  startNext(); // slot freed — start next chunk immediately
-                  if(inFlight===0 && nextChunk>=totalChunks){ winResolve(); } // all done
+                  if(r&&r._processing){ finished=true; winResolve(); return; } // polling started
+                  startNext();
+                  if(inFlight===0 && nextChunk>=totalChunks){ winResolve(); }
                 }).catch(err=>{
                   if(finished) return;
                   finished=true;
