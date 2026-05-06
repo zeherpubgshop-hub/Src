@@ -1116,6 +1116,21 @@ button:active{transform:scale(0.97);transition:transform .1s}
           <div class="prog-wrap" id="progWrap" style="display:none;flex:1;min-width:120px">
             <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
             <div class="prog-label" id="progLabel">Uploading...</div>
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <button id="pauseUploadBtn" onclick="window.togglePauseUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(255,200,0,0.15);color:#ffc800;cursor:pointer;display:none">PAUSE</button>
+              <button id="cancelUploadBtn" onclick="window.cancelUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(232,69,69,0.15);color:#e84545;cursor:pointer;display:none">CANCEL</button>
+            </div>
+          </div>
+          <div id="uploadErrorPopup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center">
+            <div style="background:#1a2035;border:1px solid rgba(232,69,69,0.4);border-radius:14px;padding:24px;max-width:320px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+              <div style="font-size:2rem;margin-bottom:8px">&#9888;&#65039;</div>
+              <div style="font-family:'Russo One',sans-serif;font-size:1rem;color:#e84545;margin-bottom:8px">Upload Failed</div>
+              <div id="uploadErrorMsg" style="font-size:.8rem;color:#94a3b8;margin-bottom:18px;line-height:1.5"></div>
+              <div style="display:flex;gap:8px">
+                <button onclick="window.retryUpload()" style="flex:1;padding:10px;background:#00d4c8;color:#000;border:none;border-radius:8px;font-weight:800;font-size:.85rem;cursor:pointer">RETRY</button>
+                <button onclick="window.dismissUploadError()" style="flex:1;padding:10px;background:rgba(255,255,255,0.08);color:#94a3b8;border:none;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer">DISMISS</button>
+              </div>
+            </div>
           </div>
         </div>
         <div id="vidPre" style="display:none;margin-top:8px;border-radius:5px;overflow:hidden;max-height:180px;background:#000"></div>
@@ -1728,11 +1743,80 @@ function onFileSelect(inp){
   }
 }
 
+// ── UPLOAD STATE ──
+let _uploadPaused=false;
+let _uploadCancelled=false;
+let _uploadResumeResolve=null;
+let _lastPendingFile=null;
+
+function _showUploadControls(show){
+  const p=document.getElementById('pauseUploadBtn');
+  const c=document.getElementById('cancelUploadBtn');
+  if(p) p.style.display=show?'block':'none';
+  if(c) c.style.display=show?'block':'none';
+}
+
+function _showUploadError(msg){
+  document.getElementById('uploadErrorMsg').textContent=msg;
+  const pop=document.getElementById('uploadErrorPopup');
+  pop.style.display='flex';
+}
+
+window.dismissUploadError=function(){
+  document.getElementById('uploadErrorPopup').style.display='none';
+  const btn=document.getElementById('videoUploadBtn');
+  if(btn){btn.disabled=false;btn.textContent='⬆ Retry Upload';btn.style.background='#ef4444';btn.style.color='#fff';}
+};
+
+window.retryUpload=function(){
+  document.getElementById('uploadErrorPopup').style.display='none';
+  if(_lastPendingFile){
+    pendingFile=_lastPendingFile;
+    window.startVideoUpload();
+  }
+};
+
+window.cancelUpload=function(){
+  _uploadCancelled=true;
+  _uploadPaused=false;
+  if(_uploadResumeResolve) _uploadResumeResolve();
+  _showUploadControls(false);
+  const progWrap=document.getElementById('progWrap');
+  if(progWrap) progWrap.style.display='none';
+  const btn=document.getElementById('videoUploadBtn');
+  if(btn){btn.disabled=false;btn.textContent='⬆ UPLOAD VIDEO TO SERVER';btn.style.background='#00d4d4';btn.style.color='#000';}
+  tst('Upload cancelled',true);
+};
+
+window.togglePauseUpload=function(){
+  const btn=document.getElementById('pauseUploadBtn');
+  const progLabel=document.getElementById('progLabel');
+  if(!_uploadPaused){
+    _uploadPaused=true;
+    if(btn) btn.textContent='▶ RESUME';
+    if(progLabel) progLabel.textContent+=' — Paused';
+  } else {
+    _uploadPaused=false;
+    if(btn) btn.textContent='⏸ PAUSE';
+    if(_uploadResumeResolve){_uploadResumeResolve();_uploadResumeResolve=null;}
+  }
+};
+
+function _waitIfPaused(){
+  if(!_uploadPaused) return Promise.resolve();
+  return new Promise(r=>{_uploadResumeResolve=r;});
+}
+
 window.startVideoUpload=function(){
   if(!pendingFile||!pendingFile.type.startsWith('video/')){tst('Select a video first',true);return;}
+  _lastPendingFile=pendingFile;
+  _uploadCancelled=false;
+  _uploadPaused=false;
   const btn=document.getElementById('videoUploadBtn');
   if(btn){btn.disabled=true;btn.textContent='Uploading...';}
+  _showUploadControls(true);
   uploadFile(pendingFile).then(result=>{
+    _showUploadControls(false);
     window._uploadedResult=result;
     pendingFile=null;
     if(btn){
@@ -1744,12 +1828,29 @@ window.startVideoUpload=function(){
     const ta=document.getElementById('thumb-upload-area');if(ta)ta.style.display='';
     if(window.initThumbSelector)window.initThumbSelector(result.url,result.duration||0);
   }).catch(err=>{
-    tst('Upload failed: '+err.message,true);
-    if(btn){btn.disabled=false;btn.textContent='⬆ Retry Upload';btn.style.background='#ef4444';btn.style.color='#fff';}
+    _showUploadControls(false);
+    if(_uploadCancelled) return;
+    const msg=_friendlyError(err.message);
+    _showUploadError(msg);
+    const progWrap=document.getElementById('progWrap');
+    if(progWrap) progWrap.style.display='none';
   });
 };
 
-// ── UPLOAD: images → base64 in Firestore, videos → Cloudinary ──
+function _friendlyError(raw){
+  if(!raw) return 'Unknown error. Please try again.';
+  if(raw.includes('Network error')||raw.includes('network')) return 'Connection lost during upload. Check your internet and retry.';
+  if(raw.includes('timed out')||raw.includes('timeout')) return 'Upload timed out — your connection may be too slow. Try a smaller video or better network.';
+  if(raw.includes('cancelled')||raw.includes('aborted')) return 'Upload was cancelled.';
+  if(raw.includes('403')||raw.includes('Unauthorized')) return 'Server rejected the upload (auth error). Contact support.';
+  if(raw.includes('500')) return 'Server error while processing video. Please retry.';
+  if(raw.includes('No file')) return 'File was not received by server. Please retry.';
+  if(raw.includes('ffmpeg')||raw.includes('compress')) return 'Video processing failed on server. Try a different video format (MP4 recommended).';
+  if(raw.includes('after')&&raw.includes('attempts')) return 'Upload failed after multiple retries. Check your connection and try again.';
+  return raw;
+}
+
+// ── UPLOAD: images → base64, videos → chunked VPS upload ──
 function uploadFile(file){
   return new Promise((resolve,reject)=>{
     const progWrap=document.getElementById('progWrap');
@@ -1760,7 +1861,7 @@ function uploadFile(file){
     progLabel.textContent='Starting...';
 
     if(file.type.startsWith('image/')){
-      // ── IMAGE: compress via canvas then store as base64 in Firestore ──
+      _showUploadControls(false);
       const img=new Image();
       const objUrl=URL.createObjectURL(file);
       img.onload=()=>{
@@ -1781,42 +1882,99 @@ function uploadFile(file){
       img.src=objUrl;
 
     } else {
-      // ── VIDEO: upload to VPS via XMLHttpRequest (gives real progress %) ──
-      progLabel.textContent='Uploading video... (This better be worth the wait)';
-      const fd=new FormData();
-      fd.append('file', file);
-      
+      // ── VIDEO: chunked upload (5MB per chunk) ──
+      const CHUNK_SIZE=5*1024*1024;
+      const totalChunks=Math.ceil(file.size/CHUNK_SIZE);
+      const uploadId=Date.now().toString(36)+Math.random().toString(36).slice(2);
+      const MAX_CHUNK_RETRIES=4;
+      let totalUploaded=0;
 
-      const xhr=new XMLHttpRequest();
-      xhr.open('POST', VPS_UPLOAD_URL);
-
-      xhr.setRequestHeader('X-Secret', VPS_SECRET);
-
-      xhr.upload.onprogress=e=>{
-        if(e.lengthComputable){
-          const pct=Math.round((e.loaded/e.total)*95);
-          progFill.style.width=pct+'%';
-          const mb=(e.loaded/1048576).toFixed(1);
-          const tot=(e.total/1048576).toFixed(1);
-          progLabel.textContent=`Uploading ${pct}% · ${mb} / ${tot} MB`;
+      async function uploadChunk(index){
+        await _waitIfPaused();
+        if(_uploadCancelled) throw new Error('Upload cancelled');
+        const start=index*CHUNK_SIZE;
+        const end=Math.min(start+CHUNK_SIZE,file.size);
+        const chunk=file.slice(start,end);
+        const chunkSize=end-start;
+        for(let attempt=1;attempt<=MAX_CHUNK_RETRIES;attempt++){
+          await _waitIfPaused();
+          if(_uploadCancelled) throw new Error('Upload cancelled');
+          try{
+            return await sendChunk(chunk,index,chunkSize,attempt);
+          }catch(err){
+            if(_uploadCancelled) throw new Error('Upload cancelled');
+            if(attempt<MAX_CHUNK_RETRIES){
+              const waitSec=attempt*3;
+              progLabel.textContent=`Chunk ${index+1}/${totalChunks} failed (${_friendlyError(err.message)}) — retrying in ${waitSec}s...`;
+              progFill.style.background='#ffc800';
+              await new Promise(r=>setTimeout(r,waitSec*1000));
+              progFill.style.background='';
+            } else {
+              throw new Error(`Part ${index+1}/${totalChunks} failed after ${MAX_CHUNK_RETRIES} attempts: ${err.message}`);
+            }
+          }
         }
-      };
-      xhr.onload=()=>{
-        if(xhr.status===200){
-          const res=JSON.parse(xhr.responseText);
-          progFill.style.width='100%';
-          progLabel.textContent='Video uploaded ✓ — Slide below to pick thumbnail';
-          setTimeout(()=>{progWrap.style.display='none';},700);
-          // Init thumbnail selector
-          if(window.initThumbSelector) window.initThumbSelector(res.url, res.duration||0);
-          resolve({url:res.url, isVideo:true});
-        } else {
+      }
+
+      function sendChunk(chunk,index,chunkSize,attempt){
+        return new Promise((res,rej)=>{
+          const xhr=new XMLHttpRequest();
+          xhr.open('POST',VPS_UPLOAD_URL.replace('/upload','/upload-chunk'));
+          xhr.setRequestHeader('X-Secret',VPS_SECRET);
+          xhr.setRequestHeader('X-Upload-Id',uploadId);
+          xhr.setRequestHeader('X-Chunk-Index',index);
+          xhr.setRequestHeader('X-Total-Chunks',totalChunks);
+          xhr.setRequestHeader('X-File-Name',file.name||'video.mp4');
+          xhr.setRequestHeader('Content-Type','application/octet-stream');
+          xhr.timeout=3*60*1000;
+          xhr.upload.onprogress=e=>{
+            if(e.lengthComputable){
+              const chunkUploaded=totalUploaded+e.loaded;
+              const pct=Math.round((chunkUploaded/file.size)*95);
+              progFill.style.width=pct+'%';
+              const mb=(chunkUploaded/1048576).toFixed(1);
+              const tot=(file.size/1048576).toFixed(1);
+              const retryStr=attempt>1?` · retry ${attempt}`:'';
+              progLabel.textContent=`Uploading ${pct}% · ${mb}/${tot} MB · part ${index+1}/${totalChunks}${retryStr}`;
+            }
+          };
+          xhr.onload=()=>{
+            if(xhr.status===200){
+              try{
+                const r=JSON.parse(xhr.responseText);
+                if(r.status==='done'){
+                  progFill.style.width='100%';
+                  progLabel.textContent='Video uploaded ✓ — Slide below to pick thumbnail';
+                  setTimeout(()=>{progWrap.style.display='none';},700);
+                  if(window.initThumbSelector) window.initThumbSelector(r.url,r.duration||0);
+                  resolve({url:r.url,isVideo:true,_done:true});
+                } else {
+                  totalUploaded+=chunkSize;
+                  res({_done:false});
+                }
+              }catch(e){rej(new Error('Bad server response — please retry'));}
+            } else {
+              rej(new Error('Server error '+xhr.status));
+            }
+          };
+          xhr.ontimeout=()=>rej(new Error('Part timed out — connection too slow'));
+          xhr.onerror=()=>rej(new Error('Network error — connection dropped'));
+          xhr.send(chunk);
+        });
+      }
+
+      (async()=>{
+        try{
+          progLabel.textContent=`Starting upload (${totalChunks} part${totalChunks>1?'s':''})...`;
+          for(let i=0;i<totalChunks;i++){
+            const result=await uploadChunk(i);
+            if(result&&result._done){resolve({url:result.url,isVideo:true});return;}
+          }
+        }catch(err){
           progWrap.style.display='none';
-          reject(new Error('Upload error: '+xhr.status+' '+xhr.responseText));
+          reject(err);
         }
-      };
-      xhr.onerror=()=>{progWrap.style.display='none';reject(new Error('Network error during upload'));};
-      xhr.send(fd);
+      })();
     }
   });
 }
@@ -3444,21 +3602,35 @@ window._uploadProofs = async function(){
 
       // Upload image to VPS — same endpoint as stock images
       const imageUrl = await new Promise((resolve, reject)=>{
-        const fd = new FormData();
-        fd.append('file', file);
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', VPS_UPLOAD_URL);
-        xhr.setRequestHeader('X-Secret', VPS_SECRET);
-        xhr.onload = ()=>{
-          if(xhr.status === 200){
-            const res = JSON.parse(xhr.responseText);
-            resolve(res.url);
-          } else {
-            reject(new Error('VPS error: '+xhr.status+' '+xhr.responseText));
-          }
-        };
-        xhr.onerror = ()=> reject(new Error('Network error — check VPS'));
-        xhr.send(fd);
+        const PROOF_MAX_RETRIES = 3;
+        let proofAttempt = 0;
+        function tryProofUpload(){
+          proofAttempt++;
+          setBtn(proofAttempt > 1 ? `Retrying ${i+1}/${total}... (attempt ${proofAttempt})` : `Uploading ${i+1}/${total}...`);
+          const fd = new FormData();
+          fd.append('file', file);
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', VPS_UPLOAD_URL);
+          xhr.setRequestHeader('X-Secret', VPS_SECRET);
+          xhr.timeout = 5 * 60 * 1000;
+          xhr.onload = ()=>{
+            if(xhr.status === 200){
+              try{ resolve(JSON.parse(xhr.responseText).url); }
+              catch(e){ handleProofFail('Bad response from server'); }
+            } else { handleProofFail('Server error: '+xhr.status); }
+          };
+          xhr.ontimeout = ()=> handleProofFail('Upload timed out — slow connection');
+          xhr.onerror   = ()=> handleProofFail('Network error — connection dropped');
+          xhr.send(fd);
+        }
+        function handleProofFail(reason){
+          if(proofAttempt < PROOF_MAX_RETRIES){
+            const waitSec = proofAttempt * 3;
+            setBtn(`${reason}. Retrying in ${waitSec}s...`);
+            setTimeout(tryProofUpload, waitSec * 1000);
+          } else { reject(new Error(reason+` (failed after ${PROOF_MAX_RETRIES} attempts)`)); }
+        }
+        tryProofUpload();
       });
 
       // Save URL to Firestore — tiny document, loads instantly
