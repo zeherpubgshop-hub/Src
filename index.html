@@ -344,6 +344,38 @@ button{cursor:pointer}
 .zvp-playbtn:hover{background:rgba(59,130,246,.3);border-color:#fff;transform:scale(1.08)}
 .zvp-ctrl{position:absolute;bottom:0;left:0;right:0;padding:8px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.9));opacity:0;transition:opacity .25s;pointer-events:none}
 .zvp:hover .zvp-ctrl,.zvp.paused .zvp-ctrl{opacity:1;pointer-events:auto}
+/* ── VIDEO PLAYER (zvp-wrap — detail page) ── */
+.zvp-wrap{position:relative;width:100%;background:#000;overflow:hidden;display:inline-block;line-height:0}
+.zvp-wrap video{width:100%;height:auto;max-height:82vh;display:block;line-height:0}
+/* overlay sits on top of video using same dimensions */
+.zvp-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);transition:opacity .25s;cursor:pointer;z-index:2}
+.zvp-wrap.playing .zvp-overlay{opacity:0;pointer-events:none}
+.zvp-wrap.playing:hover .zvp-overlay{opacity:1;pointer-events:auto;transition:opacity .15s}
+.zvp-wrap.paused .zvp-overlay,.zvp-wrap:not(.playing):not(.paused) .zvp-overlay{opacity:1;pointer-events:auto}
+.zvp-play-btn{width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:all .18s}
+.zvp-play-btn svg{margin-left:3px}
+.zvp-play-btn:hover{background:rgba(0,212,200,.35);border-color:#fff;transform:scale(1.1)}
+/* controls bar — gradient at bottom */
+.zvp-controls{position:absolute;bottom:0;left:0;right:0;padding:28px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.95));opacity:0;transition:opacity .25s;pointer-events:none;z-index:3}
+.zvp-wrap.ctrl-visible .zvp-controls,.zvp-wrap.paused .zvp-controls,.zvp-wrap:not(.playing):not(.paused) .zvp-controls{opacity:1;pointer-events:auto}
+.zvp-wrap.playing:not(.ctrl-visible){cursor:none}
+/* also hide overlay big play button when controls hidden */
+.zvp-wrap.playing:not(.ctrl-visible) .zvp-overlay{opacity:0;pointer-events:none}
+/* buffering spinner */
+.zvp-wrap.controls-hidden .zvp-controls{opacity:0!important;pointer-events:none!important}
+.zvp-wrap.controls-hidden .zvp-overlay{opacity:0!important;pointer-events:none!important}
+.zvp-wrap.controls-hidden{cursor:none}
+.zvp-wrap.buffering::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:zvp-spin .7s linear infinite;z-index:10;pointer-events:none}
+@keyframes zvp-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* volume */
+.zvp-vol-wrap{display:flex;align-items:center;gap:4px}
+.zvp-vol-slider{width:0;opacity:0;transition:width .2s,opacity .2s;accent-color:var(--accent);cursor:pointer;height:3px}
+.zvp-vol-wrap:hover .zvp-vol-slider,.zvp-vol-slider:focus{width:55px;opacity:1}
+/* speed selector */
+.zvp-speed-sel{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.65rem;padding:2px 4px;border-radius:4px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.zvp-speed-sel option{background:#111;color:#fff}
+/* fullscreen exit icon */
+.zvp-wrap:fullscreen .zvp-fs-ico path,.zvp-wrap:-webkit-full-screen .zvp-fs-ico path{d:path('M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7')}
 .zvp-prog{width:100%;height:20px;background:transparent;cursor:pointer;margin-bottom:4px;position:relative;display:flex;align-items:center}
 .zvp-track{position:absolute;left:0;right:0;height:3px;background:rgba(255,255,255,.15);border-radius:3px;top:50%;transform:translateY(-50%);transition:height .15s}
 .zvp-prog:hover .zvp-track{height:5px}
@@ -1015,6 +1047,11 @@ button:active{transform:scale(0.97);transition:transform .1s}
 
 <!-- DETAIL OVERLAY -->
 <div class="det" id="detailOverlay">
+  <!-- Video loading screen -->
+  <div id="det-loading-overlay" style="display:none;position:absolute;inset:0;z-index:50;background:#050810;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+    <div style="width:48px;height:48px;border:3px solid rgba(0,212,200,.15);border-top-color:var(--accent);border-radius:50%;animation:zvp-spin .7s linear infinite"></div>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--text2);letter-spacing:1px">Loading video...</span>
+  </div>
   <div class="det-hdr">
     <button class="det-back" onclick="window.closeDetail()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
@@ -1117,13 +1154,13 @@ button:active{transform:scale(0.97);transition:transform .1s}
             <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
             <div class="prog-label" id="progLabel">Uploading...</div>
             <div style="display:flex;gap:6px;margin-top:6px">
-              <button id="pauseUploadBtn" onclick="window.togglePauseUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(255,200,0,0.15);color:#ffc800;cursor:pointer;display:none">PAUSE</button>
-              <button id="cancelUploadBtn" onclick="window.cancelUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(232,69,69,0.15);color:#e84545;cursor:pointer;display:none">CANCEL</button>
+              <button id="pauseUploadBtn" onclick="window.togglePauseUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(255,200,0,0.15);color:#ffc800;cursor:pointer;display:none">⏸ PAUSE</button>
+              <button id="cancelUploadBtn" onclick="window.cancelUpload()" style="flex:1;padding:5px 8px;font-size:.7rem;font-weight:700;border:none;border-radius:5px;background:rgba(232,69,69,0.15);color:#e84545;cursor:pointer;display:none">✕ CANCEL</button>
             </div>
           </div>
           <div id="uploadErrorPopup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);align-items:center;justify-content:center">
             <div style="background:#1a2035;border:1px solid rgba(232,69,69,0.4);border-radius:14px;padding:24px;max-width:320px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
-              <div style="font-size:2rem;margin-bottom:8px">&#9888;&#65039;</div>
+              <div style="font-size:2rem;margin-bottom:8px">&#9888;</div>
               <div style="font-family:'Russo One',sans-serif;font-size:1rem;color:#e84545;margin-bottom:8px">Upload Failed</div>
               <div id="uploadErrorMsg" style="font-size:.8rem;color:#94a3b8;margin-bottom:18px;line-height:1.5"></div>
               <div style="display:flex;gap:8px">
@@ -1171,25 +1208,14 @@ button:active{transform:scale(0.97);transition:transform .1s}
       <!-- Form rows -->
       <div class="fg-row">
         <div class="fg" style="margin-bottom:0"><label class="fl">Price *</label><input class="fi2" id="f3" type="text" placeholder="e.g. 299"/></div>
-        <div class="fg" style="margin-bottom:0"><label class="fl">Discount Price <span style="color:var(--text2);font-size:.62rem">(optional)</span></label><input class="fi2" id="f8" type="text" placeholder="e.g. 199"/></div>
       </div>
       <div class="fg-row">
-        <div class="fg" style="margin-bottom:0"><label class="fl">Season / Rank <span style="color:var(--text2);font-size:.62rem">(optional)</span></label><input class="fi2" id="f_season" type="text" placeholder="e.g. C4S18 Conqueror"/></div>
         <div class="fg" style="margin-bottom:0"><label class="fl">Account Level <span style="color:var(--text2);font-size:.62rem">(optional)</span></label><input class="fi2" id="f_lvl" type="number" min="1" max="999" placeholder="e.g. 65"/></div>
       </div>
       <div class="fg-row">
         <div class="fg" style="margin-bottom:0"><label class="fl">Collection Level <span style="color:var(--text2);font-size:.62rem">(optional)</span></label><input class="fi2" id="f_col" type="text" placeholder="e.g. 120"/></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:13px">
-        <div class="fg" style="margin-bottom:0"><label class="fl">Mythics <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_myth" type="number" min="0" placeholder="12"/></div>
-        <div class="fg" style="margin-bottom:0"><label class="fl">Weapon Skins <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_wskin" type="number" min="0" placeholder="25"/></div>
-        <div class="fg" style="margin-bottom:0"><label class="fl">Vehicle Skins <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_vskin" type="number" min="0" placeholder="8"/></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:13px">
-        <div class="fg" style="margin-bottom:0"><label class="fl">Ultimates <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_ult" type="number" min="0" placeholder="5"/></div>
-        <div class="fg" style="margin-bottom:0"><label class="fl">X-Suits <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_xsuit" type="text" placeholder="3"/></div>
-        <div class="fg" style="margin-bottom:0"><label class="fl">KD Ratio <span style="color:var(--text2);font-size:.62rem">(opt)</span></label><input class="fi2" id="f_kd" type="text" placeholder="4.2"/></div>
-      </div>
+
       <!-- Rating + Server + Instant -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:13px">
         <div class="fg" style="margin-bottom:0">
@@ -1222,65 +1248,9 @@ button:active{transform:scale(0.97);transition:transform .1s}
           </label>
         </div>
       </div>
-      <!-- Has M416 Glacier checkbox -->
-      <div class="fg" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:13px">
-        <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
-          <input type="checkbox" id="f_glacier" style="accent-color:var(--accent);width:14px;height:14px"/>
-          <span style="font-size:.82rem;color:var(--text)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg> Has M416 Glacier</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
-          <input type="checkbox" id="f_pharaoh" style="accent-color:var(--accent);width:14px;height:14px"/>
-          <span style="font-size:.82rem;color:var(--text)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2"><path d="M12 3l3 5h5l-4 4 1 6-5-3-5 3 1-6-4-4h5z" fill="rgba(251,146,60,0.18)"/><path d="M9 17v3h6v-3"/></svg> Has Pharaoh Set</span>
-        </label>
-      </div>
-      <!-- Tags -->
-      <div class="fg">
-        <label class="fl">Tags</label>
-        <div id="tagWrap" style="position:relative">
-          <div id="tagSelected" style="display:flex;flex-wrap:wrap;gap:5px;min-height:32px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;cursor:pointer" onclick="window.toggleTagDrop()">
-            <span id="tagPlaceholder" style="font-size:.8rem;color:var(--text2)">Click to add tags...</span>
-          </div>
-          <div id="tagDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg4);border:1px solid var(--border2);border-radius:5px;z-index:50;padding:10px;margin-top:4px;max-height:200px;overflow-y:auto">
-            <div style="display:flex;gap:6px;margin-bottom:8px">
-              <input id="tagNewInp" class="fi2" type="text" placeholder="New tag name..." style="flex:1;font-size:.8rem;padding:6px 9px"/>
-              <button onclick="window.addNewTag()" class="chip active" style="padding:6px 12px">+ Add</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Skin Images -->
-      <div class="fg">
-        <label class="fl">Skin Images <span style="color:var(--text2);font-size:.62rem">(upload up to 3 screenshots)</span></label>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="skinUploadGrid">
-          <label style="cursor:pointer;display:block;aspect-ratio:1;border-radius:6px;background:var(--bg3);border:1px dashed rgba(59,130,246,.25);overflow:hidden;position:relative">
-            <img id="skin_prev_1" style="width:100%;height:100%;object-fit:cover;display:none" alt=""/>
-            <div id="skin_ph_1" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--text2)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span style="font-size:.58rem;font-family:'Barlow Condensed',sans-serif">SKIN 1</span>
-            </div>
-            <input type="file" accept="image/*" style="display:none" onchange="window.uploadSkinImg(this,1)"/>
-          </label>
-          <label style="cursor:pointer;display:block;aspect-ratio:1;border-radius:6px;background:var(--bg3);border:1px dashed rgba(59,130,246,.25);overflow:hidden;position:relative">
-            <img id="skin_prev_2" style="width:100%;height:100%;object-fit:cover;display:none" alt=""/>
-            <div id="skin_ph_2" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--text2)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span style="font-size:.58rem;font-family:'Barlow Condensed',sans-serif">SKIN 2</span>
-            </div>
-            <input type="file" accept="image/*" style="display:none" onchange="window.uploadSkinImg(this,2)"/>
-          </label>
-          <label style="cursor:pointer;display:block;aspect-ratio:1;border-radius:6px;background:var(--bg3);border:1px dashed rgba(59,130,246,.25);overflow:hidden;position:relative">
-            <img id="skin_prev_3" style="width:100%;height:100%;object-fit:cover;display:none" alt=""/>
-            <div id="skin_ph_3" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--text2)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span style="font-size:.58rem;font-family:'Barlow Condensed',sans-serif">SKIN 3</span>
-            </div>
-            <input type="file" accept="image/*" style="display:none" onchange="window.uploadSkinImg(this,3)"/>
-          </label>
-        </div>
-        <input type="hidden" id="f_skin1" value=""/>
-        <input type="hidden" id="f_skin2" value=""/>
-        <input type="hidden" id="f_skin3" value=""/>
-      </div>
+
+
+
       <!-- Description -->
       <div class="fg"><label class="fl">Description <span style="color:var(--text2);font-size:.62rem">(optional)</span></label><textarea class="fta" id="f2" placeholder="e.g. Season 24 Conqueror, 200+ outfits, Glacier M416..."></textarea></div>
       <!-- Actions -->
@@ -1585,6 +1555,7 @@ function doLogin(){
 // ── TAG SYSTEM ────────────────────────────────────────
 function rebuildTagDropdown(){
   const dd=document.getElementById('tagDropdown');
+  if(!dd) return; // tags section removed
   const addRow=dd.querySelector('.tag-add-row');
   // Remove existing checkboxes
   dd.querySelectorAll('.tag-opt').forEach(el=>el.remove());
@@ -1598,6 +1569,7 @@ function rebuildTagDropdown(){
 }
 function toggleTagDrop(){
   const dd=document.getElementById('tagDropdown'),sel=document.getElementById('tagSelected');
+  if(!dd||!sel) return;
   const open=dd.classList.toggle('open');
   sel.classList.toggle('open',open);
   if(open){rebuildTagDropdown();document.getElementById('tagNewInp').value='';}
@@ -1629,6 +1601,7 @@ function addNewTag(){
 function renderTagPills(){
   const sel=document.getElementById('tagSelected');
   const ph=document.getElementById('tagPlaceholder');
+  if(!sel||!ph) return;
   // Remove old pills (keep the dropdown ref intact)
   sel.querySelectorAll('.tag-pill').forEach(p=>p.remove());
   if(selectedTags.length===0){ph.style.display='';return;}
@@ -1647,9 +1620,10 @@ function removeTag(tag){
 }
 // Close dropdown on outside click
 document.addEventListener('click',e=>{
-  if(!document.getElementById('tagWrap').contains(e.target)){
-    document.getElementById('tagDropdown').classList.remove('open');
-    document.getElementById('tagSelected').classList.remove('open');
+  const tw=document.getElementById('tagWrap');
+  if(tw&&!tw.contains(e.target)){
+    const td=document.getElementById('tagDropdown'); if(td) td.classList.remove('open');
+    const ts=document.getElementById('tagSelected'); if(ts) ts.classList.remove('open');
   }
 });
 
@@ -1744,74 +1718,66 @@ function onFileSelect(inp){
 }
 
 // ── UPLOAD STATE ──
-let _uploadPaused=false;
-let _uploadCancelled=false;
-let _uploadResumeResolve=null;
-let _lastPendingFile=null;
-
+let _uploadPaused=false,_uploadCancelled=false,_uploadResumeResolve=null,_lastPendingFile=null;
 function _showUploadControls(show){
-  const p=document.getElementById('pauseUploadBtn');
-  const c=document.getElementById('cancelUploadBtn');
-  if(p) p.style.display=show?'block':'none';
-  if(c) c.style.display=show?'block':'none';
+  const p=document.getElementById('pauseUploadBtn'),c=document.getElementById('cancelUploadBtn');
+  if(p)p.style.display=show?'block':'none';
+  if(c)c.style.display=show?'block':'none';
 }
-
 function _showUploadError(msg){
-  document.getElementById('uploadErrorMsg').textContent=msg;
-  const pop=document.getElementById('uploadErrorPopup');
-  pop.style.display='flex';
+  const el=document.getElementById('uploadErrorMsg');if(el)el.textContent=msg;
+  const pop=document.getElementById('uploadErrorPopup');if(pop)pop.style.display='flex';
 }
-
 window.dismissUploadError=function(){
-  document.getElementById('uploadErrorPopup').style.display='none';
+  const pop=document.getElementById('uploadErrorPopup');if(pop)pop.style.display='none';
   const btn=document.getElementById('videoUploadBtn');
   if(btn){btn.disabled=false;btn.textContent='⬆ Retry Upload';btn.style.background='#ef4444';btn.style.color='#fff';}
 };
-
 window.retryUpload=function(){
-  document.getElementById('uploadErrorPopup').style.display='none';
-  if(_lastPendingFile){
-    pendingFile=_lastPendingFile;
-    window.startVideoUpload();
-  }
+  const pop=document.getElementById('uploadErrorPopup');if(pop)pop.style.display='none';
+  if(_lastPendingFile){pendingFile=_lastPendingFile;window.startVideoUpload();}
 };
-
 window.cancelUpload=function(){
-  _uploadCancelled=true;
-  _uploadPaused=false;
-  if(_uploadResumeResolve) _uploadResumeResolve();
+  _uploadCancelled=true;_uploadPaused=false;
+  if(_uploadResumeResolve)_uploadResumeResolve();
   _showUploadControls(false);
-  const progWrap=document.getElementById('progWrap');
-  if(progWrap) progWrap.style.display='none';
+  const progWrap=document.getElementById('progWrap');if(progWrap)progWrap.style.display='none';
   const btn=document.getElementById('videoUploadBtn');
   if(btn){btn.disabled=false;btn.textContent='⬆ UPLOAD VIDEO TO SERVER';btn.style.background='#00d4d4';btn.style.color='#000';}
   tst('Upload cancelled',true);
 };
-
 window.togglePauseUpload=function(){
   const btn=document.getElementById('pauseUploadBtn');
   const progLabel=document.getElementById('progLabel');
   if(!_uploadPaused){
     _uploadPaused=true;
-    if(btn) btn.textContent='▶ RESUME';
-    if(progLabel) progLabel.textContent+=' — Paused';
-  } else {
+    if(btn)btn.textContent='▶ RESUME';
+    if(progLabel)progLabel.textContent+=' — Paused';
+  }else{
     _uploadPaused=false;
-    if(btn) btn.textContent='⏸ PAUSE';
+    if(btn)btn.textContent='⏸ PAUSE';
     if(_uploadResumeResolve){_uploadResumeResolve();_uploadResumeResolve=null;}
   }
 };
-
 function _waitIfPaused(){
-  if(!_uploadPaused) return Promise.resolve();
+  if(!_uploadPaused)return Promise.resolve();
   return new Promise(r=>{_uploadResumeResolve=r;});
+}
+function _friendlyError(raw){
+  if(!raw)return 'Unknown error. Please try again.';
+  if(raw.includes('Network error')||raw.includes('network'))return 'Connection lost. Check your internet and retry.';
+  if(raw.includes('timed out')||raw.includes('timeout'))return 'Upload timed out — connection too slow.';
+  if(raw.includes('cancelled')||raw.includes('aborted'))return 'Upload was cancelled.';
+  if(raw.includes('403')||raw.includes('Unauthorized'))return 'Server rejected upload (auth error).';
+  if(raw.includes('500'))return 'Server error while processing. Please retry.';
+  if(raw.includes('after')&&raw.includes('attempts'))return 'Failed after multiple retries. Check connection.';
+  return raw;
 }
 
 window.startVideoUpload=function(){
   if(!pendingFile||!pendingFile.type.startsWith('video/')){tst('Select a video first',true);return;}
   _lastPendingFile=pendingFile;
-  _uploadCancelled=false;
-  _uploadPaused=false;
+  _uploadCancelled=false;_uploadPaused=false;
   const btn=document.getElementById('videoUploadBtn');
   if(btn){btn.disabled=true;btn.textContent='Uploading...';}
   _showUploadControls(true);
@@ -1819,38 +1785,18 @@ window.startVideoUpload=function(){
     _showUploadControls(false);
     window._uploadedResult=result;
     pendingFile=null;
-    if(btn){
-      btn.textContent='✅ Done! Pick thumbnail below';
-      btn.style.background='#22c55e';
-      btn.style.color='#fff';
-      setTimeout(()=>{btn.style.display='none';},2500);
-    }
+    if(btn){btn.textContent='✅ Done! Pick thumbnail below';btn.style.background='#22c55e';btn.style.color='#fff';setTimeout(()=>{btn.style.display='none';},2500);}
     const ta=document.getElementById('thumb-upload-area');if(ta)ta.style.display='';
     if(window.initThumbSelector)window.initThumbSelector(result.url,result.duration||0);
   }).catch(err=>{
     _showUploadControls(false);
-    if(_uploadCancelled) return;
-    const msg=_friendlyError(err.message);
-    _showUploadError(msg);
-    const progWrap=document.getElementById('progWrap');
-    if(progWrap) progWrap.style.display='none';
+    if(_uploadCancelled)return;
+    _showUploadError(_friendlyError(err.message));
+    const progWrap=document.getElementById('progWrap');if(progWrap)progWrap.style.display='none';
   });
 };
 
-function _friendlyError(raw){
-  if(!raw) return 'Unknown error. Please try again.';
-  if(raw.includes('Network error')||raw.includes('network')) return 'Connection lost during upload. Check your internet and retry.';
-  if(raw.includes('timed out')||raw.includes('timeout')) return 'Upload timed out — your connection may be too slow. Try a smaller video or better network.';
-  if(raw.includes('cancelled')||raw.includes('aborted')) return 'Upload was cancelled.';
-  if(raw.includes('403')||raw.includes('Unauthorized')) return 'Server rejected the upload (auth error). Contact support.';
-  if(raw.includes('500')) return 'Server error while processing video. Please retry.';
-  if(raw.includes('No file')) return 'File was not received by server. Please retry.';
-  if(raw.includes('ffmpeg')||raw.includes('compress')) return 'Video processing failed on server. Try a different video format (MP4 recommended).';
-  if(raw.includes('after')&&raw.includes('attempts')) return 'Upload failed after multiple retries. Check your connection and try again.';
-  return raw;
-}
-
-// ── UPLOAD: images → base64, videos → chunked VPS upload ──
+// ── UPLOAD: images → base64 in Firestore, videos → Cloudinary ──
 function uploadFile(file){
   return new Promise((resolve,reject)=>{
     const progWrap=document.getElementById('progWrap');
@@ -1861,7 +1807,7 @@ function uploadFile(file){
     progLabel.textContent='Starting...';
 
     if(file.type.startsWith('image/')){
-      _showUploadControls(false);
+      // ── IMAGE: compress via canvas then store as base64 in Firestore ──
       const img=new Image();
       const objUrl=URL.createObjectURL(file);
       img.onload=()=>{
@@ -1882,94 +1828,174 @@ function uploadFile(file){
       img.src=objUrl;
 
     } else {
-      // ── VIDEO: chunked upload (5MB per chunk) ──
-      const CHUNK_SIZE=5*1024*1024;
-      const totalChunks=Math.ceil(file.size/CHUNK_SIZE);
+      // ── VIDEO: speed-aware chunked upload with robust retry ──
+      const MB=1024*1024;
+      const sz=file.size;
+      const PARALLEL=3;
+      const MAX_CHUNK_RETRIES=5;
       const uploadId=Date.now().toString(36)+Math.random().toString(36).slice(2);
-      const MAX_CHUNK_RETRIES=4;
-      let totalUploaded=0;
 
-      async function uploadChunk(index){
-        await _waitIfPaused();
-        if(_uploadCancelled) throw new Error('Upload cancelled');
-        const start=index*CHUNK_SIZE;
-        const end=Math.min(start+CHUNK_SIZE,file.size);
-        const chunk=file.slice(start,end);
-        const chunkSize=end-start;
-        for(let attempt=1;attempt<=MAX_CHUNK_RETRIES;attempt++){
-          await _waitIfPaused();
-          if(_uploadCancelled) throw new Error('Upload cancelled');
-          try{
-            return await sendChunk(chunk,index,chunkSize,attempt);
-          }catch(err){
-            if(_uploadCancelled) throw new Error('Upload cancelled');
-            if(attempt<MAX_CHUNK_RETRIES){
-              const waitSec=attempt*3;
-              progLabel.textContent=`Chunk ${index+1}/${totalChunks} failed (${_friendlyError(err.message)}) — retrying in ${waitSec}s...`;
-              progFill.style.background='#ffc800';
-              await new Promise(r=>setTimeout(r,waitSec*1000));
-              progFill.style.background='';
-            } else {
-              throw new Error(`Part ${index+1}/${totalChunks} failed after ${MAX_CHUNK_RETRIES} attempts: ${err.message}`);
-            }
-          }
-        }
+      // Determine chunk size from file size AND network speed
+      function pickChunkSize(speedMBs){
+        const byFile = sz<20*MB?10*MB : sz<50*MB?15*MB : sz<150*MB?20*MB : 25*MB;
+        const bySpeed = speedMBs<1?5*MB : speedMBs<3?10*MB : speedMBs<8?15*MB : 25*MB;
+        return Math.min(byFile, bySpeed);
       }
 
-      function sendChunk(chunk,index,chunkSize,attempt){
-        return new Promise((res,rej)=>{
+      // Measure speed by uploading a small test blob (NOT a real chunk)
+      async function measureSpeed(){
+        const testSize=Math.min(1*MB, sz);
+        const testBlob=file.slice(0, testSize);
+        return new Promise(res=>{
+          const t0=Date.now();
           const xhr=new XMLHttpRequest();
-          xhr.open('POST',VPS_UPLOAD_URL.replace('/upload','/upload-chunk'));
-          xhr.setRequestHeader('X-Secret',VPS_SECRET);
-          xhr.setRequestHeader('X-Upload-Id',uploadId);
-          xhr.setRequestHeader('X-Chunk-Index',index);
-          xhr.setRequestHeader('X-Total-Chunks',totalChunks);
-          xhr.setRequestHeader('X-File-Name',file.name||'video.mp4');
-          xhr.setRequestHeader('Content-Type','application/octet-stream');
-          xhr.timeout=3*60*1000;
-          xhr.upload.onprogress=e=>{
-            if(e.lengthComputable){
-              const chunkUploaded=totalUploaded+e.loaded;
-              const pct=Math.round((chunkUploaded/file.size)*95);
-              progFill.style.width=pct+'%';
-              const mb=(chunkUploaded/1048576).toFixed(1);
-              const tot=(file.size/1048576).toFixed(1);
-              const retryStr=attempt>1?` · retry ${attempt}`:'';
-              progLabel.textContent=`Uploading ${pct}% · ${mb}/${tot} MB · part ${index+1}/${totalChunks}${retryStr}`;
-            }
-          };
+          // Use /health endpoint trick — just POST to upload with a fake id that won't collide
+          xhr.open('POST', VPS_UPLOAD_URL.replace('/upload','/upload-chunk'));
+          xhr.setRequestHeader('X-Secret', VPS_SECRET);
+          xhr.setRequestHeader('X-Upload-Id', 'probe_'+uploadId);
+          xhr.setRequestHeader('X-Chunk-Index', '0');
+          xhr.setRequestHeader('X-Total-Chunks', '1'); // tells server to merge immediately & discard
+          xhr.setRequestHeader('X-File-Name', 'probe.mp4');
+          xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+          xhr.timeout=30*1000;
           xhr.onload=()=>{
-            if(xhr.status===200){
-              try{
-                const r=JSON.parse(xhr.responseText);
-                if(r.status==='done'){
-                  progFill.style.width='100%';
-                  progLabel.textContent='Video uploaded ✓ — Slide below to pick thumbnail';
-                  setTimeout(()=>{progWrap.style.display='none';},700);
-                  if(window.initThumbSelector) window.initThumbSelector(r.url,r.duration||0);
-                  resolve({url:r.url,isVideo:true,_done:true});
-                } else {
-                  totalUploaded+=chunkSize;
-                  res({_done:false});
-                }
-              }catch(e){rej(new Error('Bad server response — please retry'));}
-            } else {
-              rej(new Error('Server error '+xhr.status));
-            }
+            const secs=Math.max((Date.now()-t0)/1000, 0.1);
+            res((testBlob.size/MB)/secs);
           };
-          xhr.ontimeout=()=>rej(new Error('Part timed out — connection too slow'));
-          xhr.onerror=()=>rej(new Error('Network error — connection dropped'));
-          xhr.send(chunk);
+          xhr.onerror=xhr.ontimeout=()=>res(1); // fallback: assume 1 MB/s
+          xhr.send(testBlob);
         });
       }
 
       (async()=>{
         try{
-          progLabel.textContent=`Starting upload (${totalChunks} part${totalChunks>1?'s':''})...`;
-          for(let i=0;i<totalChunks;i++){
-            const result=await uploadChunk(i);
-            if(result&&result._done){resolve({url:result.url,isVideo:true});return;}
+          // ── Step 1: measure speed ──
+          progLabel.textContent='Checking connection speed...';
+          progFill.style.width='2%';
+          const speedMBs = sz > 1*MB ? await measureSpeed() : 5;
+          if(_uploadCancelled) throw new Error('Upload cancelled');
+
+          const CHUNK_SIZE=pickChunkSize(speedMBs);
+          const totalChunks=Math.ceil(sz/CHUNK_SIZE);
+          const speedLabel=speedMBs<1?'Slow':speedMBs<3?'Medium':speedMBs<8?'Fast':'Very Fast';
+
+          progLabel.textContent=`${speedLabel} (${speedMBs.toFixed(1)} MB/s) · ${(CHUNK_SIZE/MB).toFixed(0)}MB chunks · ${totalChunks} parts`;
+          progFill.style.width='3%';
+
+          // Track per-chunk uploaded bytes for smooth combined progress
+          const uploadedPerChunk=new Array(totalChunks).fill(0);
+          function getProgress(){ return uploadedPerChunk.reduce((a,b)=>a+b,0); }
+
+          // ── Step 2: upload chunk with retry ──
+          async function uploadChunk(index){
+            await _waitIfPaused();
+            if(_uploadCancelled) throw new Error('Upload cancelled');
+            const start=index*CHUNK_SIZE;
+            const end=Math.min(start+CHUNK_SIZE, sz);
+            const chunk=file.slice(start, end);
+            const chunkSize=end-start;
+
+            for(let attempt=1; attempt<=MAX_CHUNK_RETRIES; attempt++){
+              await _waitIfPaused();
+              if(_uploadCancelled) throw new Error('Upload cancelled');
+              try{
+                return await sendChunk(chunk, index, chunkSize, attempt);
+              }catch(err){
+                if(_uploadCancelled) throw new Error('Upload cancelled');
+                uploadedPerChunk[index]=0;
+                if(attempt<MAX_CHUNK_RETRIES){
+                  const waitSec=Math.min(attempt*4, 15);
+                  progLabel.textContent=`Part ${index+1}/${totalChunks} failed — retrying in ${waitSec}s... (${attempt}/${MAX_CHUNK_RETRIES})`;
+                  progFill.style.background='#ffc800';
+                  await new Promise(r=>setTimeout(r, waitSec*1000));
+                  progFill.style.background='';
+                } else {
+                  throw new Error(`Part ${index+1}/${totalChunks} failed after ${MAX_CHUNK_RETRIES} attempts: ${err.message}`);
+                }
+              }
+            }
           }
+
+          function sendChunk(chunk, index, chunkSize, attempt){
+            return new Promise((res,rej)=>{
+              const xhr=new XMLHttpRequest();
+              xhr.open('POST', VPS_UPLOAD_URL.replace('/upload','/upload-chunk'));
+              xhr.setRequestHeader('X-Secret', VPS_SECRET);
+              xhr.setRequestHeader('X-Upload-Id', uploadId);
+              xhr.setRequestHeader('X-Chunk-Index', String(index));
+              xhr.setRequestHeader('X-Total-Chunks', String(totalChunks));
+              xhr.setRequestHeader('X-File-Name', file.name||'video.mp4');
+              xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+              // Timeout scales with chunk size: 1 min per 5MB minimum 2 min
+              xhr.timeout=Math.max(2*60*1000, Math.ceil(chunkSize/MB/5)*60*1000);
+              xhr.upload.onprogress=e=>{
+                if(e.lengthComputable){
+                  uploadedPerChunk[index]=e.loaded;
+                  const done=getProgress();
+                  const pct=Math.round((done/sz)*95);
+                  progFill.style.width=pct+'%';
+                  const mb=(done/MB).toFixed(1);
+                  const tot=(sz/MB).toFixed(1);
+                  const retryStr=attempt>1?` · retry ${attempt}`:'';
+                  progLabel.textContent=`Uploading ${pct}% · ${mb}/${tot} MB · ${speedLabel} ${speedMBs.toFixed(1)}MB/s${retryStr}`;
+                }
+              };
+              xhr.onload=()=>{
+                if(xhr.status===200){
+                  try{
+                    const r=JSON.parse(xhr.responseText);
+                    if(r.status==='done'){
+                      // Last chunk — server merged and responded
+                      progFill.style.width='100%';
+                      progLabel.textContent='Video uploaded ✓ — Slide below to pick thumbnail';
+                      setTimeout(()=>{ progWrap.style.display='none'; },700);
+                      if(window.initThumbSelector) window.initThumbSelector(r.url, r.duration||0);
+                      resolve({url:r.url, isVideo:true, _done:true});
+                    } else {
+                      uploadedPerChunk[index]=chunkSize;
+                      res({_done:false});
+                    }
+                  }catch(e){ rej(new Error('Bad server response')); }
+                } else if(xhr.status===0){
+                  rej(new Error('Connection lost — no response from server'));
+                } else {
+                  rej(new Error('Server error '+xhr.status));
+                }
+              };
+              xhr.ontimeout=()=>rej(new Error('Chunk timed out — connection too slow'));
+              xhr.onerror=()=>rej(new Error('Network error — connection dropped'));
+              xhr.send(chunk);
+            });
+          }
+
+          // ── Step 3: sliding window upload (always PARALLEL in-flight) ──
+          await new Promise((winResolve, winReject)=>{
+            let nextChunk=0;       // next chunk index to start
+            let inFlight=0;        // currently uploading
+            let finished=false;    // done flag
+
+            function startNext(){
+              while(inFlight < PARALLEL && nextChunk < totalChunks && !finished && !_uploadCancelled){
+                const idx=nextChunk++;
+                inFlight++;
+                uploadChunk(idx).then(r=>{
+                  inFlight--;
+                  if(finished) return;
+                  if(r&&r._done){ finished=true; resolve({url:r.url,isVideo:true}); winResolve(); return; }
+                  startNext(); // slot freed — start next chunk immediately
+                  if(inFlight===0 && nextChunk>=totalChunks){ winResolve(); } // all done
+                }).catch(err=>{
+                  if(finished) return;
+                  finished=true;
+                  winReject(err);
+                });
+              }
+              if(_uploadCancelled && !finished){ finished=true; winReject(new Error('Upload cancelled')); }
+            }
+
+            startNext();
+          });
+
         }catch(err){
           progWrap.style.display='none';
           reject(err);
@@ -2004,13 +2030,13 @@ async function submitForm(){
     const data={
       desc:document.getElementById('f2').value.trim(),
       price:document.getElementById('f3').value.trim(),
-      discountPrice:document.getElementById('f8').value.trim(),
+      discountPrice:document.getElementById('f8')?.value.trim()||'',
       collectionLevel: document.getElementById('f_col').value.trim()||'',
       accountLevel:    document.getElementById('f_lvl').value.trim()||'',
-      season:          document.getElementById('f_season').value.trim()||'',
-      mythicCount:     document.getElementById('f_myth').value.trim()||'',
-      ultimateCount:   document.getElementById('f_ult').value.trim()||'',
-      xsuitCount:      document.getElementById('f_xsuit').value.trim()||'',
+      season:          document.getElementById('f_season')?.value.trim()||'',
+      mythicCount:     document.getElementById('f_myth')?.value.trim()||'',
+      ultimateCount:   document.getElementById('f_ult')?.value.trim()||'',
+      xsuitCount:      document.getElementById('f_xsuit')?.value.trim()||'',
       weaponSkins:     document.getElementById('f_wskin')?.value.trim()||'',
       vehicleSkins:    document.getElementById('f_vskin')?.value.trim()||'',
       kdRatio:         document.getElementById('f_kd')?.value.trim()||'',
@@ -2059,13 +2085,13 @@ function editItem(fid){
   // document.getElementById('f1') removed — no title field
   document.getElementById('f2').value=item.desc||'';
   document.getElementById('f3').value=item.price||'';
-  document.getElementById('f8').value=item.discountPrice||'';
+  const f8el=document.getElementById('f8'); if(f8el) f8el.value=item.discountPrice||'';
   document.getElementById('f_col').value    = item.collectionLevel||'';
   document.getElementById('f_lvl').value    = item.accountLevel||'';
-  document.getElementById('f_season').value = item.season||'';
-  document.getElementById('f_myth').value   = item.mythicCount||'';
-  document.getElementById('f_ult').value    = item.ultimateCount||'';
-  document.getElementById('f_xsuit').value  = item.xsuitCount||'';
+  const fseason=document.getElementById('f_season'); if(fseason) fseason.value=item.season||'';
+  const fmyth=document.getElementById('f_myth'); if(fmyth) fmyth.value=item.mythicCount||'';
+  const fult=document.getElementById('f_ult'); if(fult) fult.value=item.ultimateCount||'';
+  const fxsuit=document.getElementById('f_xsuit'); if(fxsuit) fxsuit.value=item.xsuitCount||'';
   const fw=document.getElementById('f_wskin'); if(fw) fw.value=item.weaponSkins||'';
   const fv=document.getElementById('f_vskin'); if(fv) fv.value=item.vehicleSkins||'';
   const fk=document.getElementById('f_kd');    if(fk) fk.value=item.kdRatio||'';
@@ -2119,8 +2145,8 @@ function cancelEdit(){
   document.getElementById('cancelEditBtn').style.display='none';
 }
 function clearForm(){
-  ['f2','f3','f8','f_lvl','f_myth','f_ult'].forEach(id=>document.getElementById(id).value='');
-  ['f_col','f_season','f_xsuit'].forEach(id=>document.getElementById(id).value='');
+  ['f2','f3','f8','f_lvl','f_myth','f_ult'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f_col','f_season','f_xsuit'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['f_wskin','f_vskin','f_kd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';})
   document.getElementById('f5').value='';
   // Reset thumbnail
@@ -2310,30 +2336,69 @@ function renderDetailPage(){
   // Video player
   const VID_BADGE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" style="vertical-align:middle;flex-shrink:0"><path fill="#1da1f2" d="M23 12l-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.69L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68z"/><polyline points="8,12.5 11,15.5 17,9.5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
+  // Detect if it's a video — check isVideo flag OR mediaUrl contains video extension
+  const isVideoItem = item.isVideo || (item.mediaUrl && /\.(mp4|webm|mov|raw_)/.test(item.mediaUrl));
+
   let mediaHtml='';
-  if(item.mediaUrl&&item.isVideo){
-    mediaHtml=`<div class="zvp-wrap" id="zvp-det" data-src="${item.mediaUrl}" style="aspect-ratio:16/9;border-radius:0">
-      <video preload="metadata" playsinline oncontextmenu="return false" ${item.thumbnailUrl?`poster="${item.thumbnailUrl}"`:''}></video>
-      <div class="zvp-speed" id="zvp-det-speed">-- KB/s</div>
+  if(item.mediaUrl && isVideoItem){
+    const thumbAttr = item.thumbnailUrl ? `data-poster="${item.thumbnailUrl}"` : '';
+    const posterStyle = item.thumbnailUrl ? `background:url('${item.thumbnailUrl}') center/cover no-repeat;` : '';
+    mediaHtml=`<div class="zvp-wrap" id="zvp-det" data-src="${item.mediaUrl}" style="border-radius:0;${posterStyle}" tabindex="0">
+      <video preload="none" playsinline oncontextmenu="return false" ${item.thumbnailUrl?`poster="${item.thumbnailUrl}"`:''}></video>
       <div class="zvp-overlay" onclick="window.zvpToggle(this.closest('.zvp-wrap'))">
         <div class="zvp-play-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg></div>
       </div>
       <div class="zvp-controls">
-        <div class="zvp-prog" id="zvp-det-prog"><div class="zvp-track"></div><div class="zvp-buf" style="width:0%"></div><div class="zvp-fill" style="width:0%"></div></div>
+        <!-- Progress bar -->
+        <div class="zvp-prog" id="zvp-det-prog">
+          <div class="zvp-track"></div>
+          <div class="zvp-buf" style="width:0%"></div>
+          <div class="zvp-fill" style="width:0%"></div>
+        </div>
+        <!-- Bottom bar -->
         <div class="zvp-bot">
           <div class="zvp-left">
-            <button class="zvp-btn" onclick="window.zvpToggle(this.closest('.zvp-wrap'))"><svg class="zvp-play-ico" width="15" height="15" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg></button>
-            <button class="zvp-btn" onclick="window.zvpMute(this.closest('.zvp-wrap'))"><svg class="zvp-vol-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg></button>
+            <!-- Play/Pause -->
+            <button class="zvp-btn" title="Play (Space)" onclick="window.zvpToggle(this.closest('.zvp-wrap'))">
+              <svg class="zvp-play-ico" width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg>
+            </button>
+            <!-- Volume -->
+            <div class="zvp-vol-wrap">
+              <button class="zvp-btn" title="Mute (M)" onclick="window.zvpMute(this.closest('.zvp-wrap'))">
+                <svg class="zvp-vol-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 010 7.07"/><path class="zvp-vol-line2" d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+              </button>
+              <input class="zvp-vol-slider" type="range" min="0" max="1" step="0.02" value="1" title="Volume"
+                oninput="const v=this.closest('.zvp-wrap').querySelector('video');v.volume=this.value;v.muted=this.value==0;this.closest('.zvp-wrap').querySelector('.zvp-vol-ico').style.opacity=this.value==0?'0.3':'1'"/>
+            </div>
+            <!-- Time -->
             <span class="zvp-time"><span class="zvp-cur">0:00</span> / <span class="zvp-dur">0:00</span></span>
           </div>
-          <button class="zvp-btn" onclick="window.zvpFullscreen(this.closest('.zvp-wrap'))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg></button>
+          <div class="zvp-right" style="display:flex;align-items:center;gap:6px">
+            <!-- Playback speed -->
+            <select class="zvp-speed-sel" title="Playback speed"
+              onchange="this.closest('.zvp-wrap').querySelector('video').playbackRate=parseFloat(this.value)">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+            <!-- Fullscreen -->
+            <button class="zvp-btn" title="Fullscreen (F)" onclick="window.zvpFullscreen(this.closest('.zvp-wrap'))">
+              <svg class="zvp-fs-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>`;
-  } else if(item.mediaUrl){
-    mediaHtml=`<img src="${item.mediaUrl}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" oncontextmenu="return false"/>`;
+  } else if(item.mediaUrl && !isVideoItem){
+    // Image listing — show image
+    mediaHtml=`<div class="det-main" style="aspect-ratio:16/9;border-radius:0">
+      <img src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}" style="width:100%;height:100%;object-fit:cover;display:block" oncontextmenu="return false" draggable="false"/>
+    </div>`;
   } else {
-    mediaHtml=`<div style="width:100%;aspect-ratio:16/9;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,200,0.5)" stroke-width="1.5"><rect x="2" y="7" width="20" height="12" rx="3"/><path d="M7 11v4M9 13H5M17 11h2M19 13h-2" stroke-linecap="round"/><circle cx="12" cy="13" r="1" fill="rgba(0,212,200,0.5)"/></svg></div>`;
+    mediaHtml='';
   }
 
   // Stars
@@ -2450,7 +2515,10 @@ function renderDetailPage(){
   // Init video player
   setTimeout(()=>{
     const wrap=document.getElementById('zvp-det');
-    if(wrap) zvpInit(wrap);
+    const loadingOverlay=document.getElementById('det-loading-overlay');
+    if(loadingOverlay) loadingOverlay.style.display='none';
+    if(!wrap) return;
+    zvpInit(wrap);
   },100);
 
   // Auto-pause when scrolled out
@@ -2531,12 +2599,57 @@ function initLazyMedia(){
       _lazyObserver.unobserve(el);
     });
   },{
-    rootMargin: '200px 0px', // start loading 200px before entering viewport
+    rootMargin: '200px 0px',
     threshold: 0
   });
 
   document.querySelectorAll('.lazy-media[data-src]').forEach(el=>{
     _lazyObserver.observe(el);
+  });
+
+  // ── Card hover: play video on hover, pause on leave ──
+  document.querySelectorAll('.card-vid-wrap').forEach(wrap=>{
+    const vid=wrap.querySelector('.card-hover-vid');
+    const img=wrap.querySelector('img');
+    const playIcon=wrap.querySelector('.card-play-icon');
+    if(!vid) return;
+
+    wrap.addEventListener('mouseenter',()=>{
+      // Lazy load the video src on first hover
+      if(vid.dataset.src&&!vid.src){
+        vid.src=vid.dataset.src;
+        vid.load();
+      }
+      vid.play().catch(()=>{});
+      if(img) img.style.opacity='0';
+      vid.style.opacity='1';
+      if(playIcon) playIcon.style.opacity='0';
+    });
+
+    wrap.addEventListener('mouseleave',()=>{
+      vid.pause();
+      vid.currentTime=0;
+      if(img) img.style.opacity='1';
+      vid.style.opacity='0';
+      if(playIcon) playIcon.style.opacity='1';
+    });
+
+    // Mobile: tap to toggle
+    wrap.addEventListener('click',e=>{
+      if(vid.paused){
+        if(vid.dataset.src&&!vid.src){vid.src=vid.dataset.src;vid.load();}
+        vid.play().catch(()=>{});
+        if(img) img.style.opacity='0';
+        vid.style.opacity='1';
+        if(playIcon) playIcon.style.opacity='0';
+      } else {
+        vid.pause();
+        vid.currentTime=0;
+        if(img) img.style.opacity='1';
+        vid.style.opacity='0';
+        if(playIcon) playIcon.style.opacity='1';
+      }
+    });
   });
 }
 
@@ -2594,24 +2707,18 @@ function renderPub(){
     html+=availableItems.map(item=>{
       const fid=item.firestoreId;
       let thumb='<div class="cip" style="display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,200,0.5)" stroke-width="1.5"><rect x="2" y="7" width="20" height="12" rx="3"/><path d="M7 11v4M9 13H5M17 11h2M19 13h-2" stroke-linecap="round"/><circle cx="12" cy="13" r="1" fill="rgba(0,212,200,0.5)"/></svg></div>';
-      if(item.thumbnailUrl){
-        // Use uploaded thumbnail — cleanest, fastest
-        thumb=`<img class="ci lazy-media" data-src="${item.thumbnailUrl}" alt="#ZHR-${zhrId(fid)}" oncontextmenu="return false" draggable="false"/>`;
-      } else if(item.mediaUrl){
-        if(item.isVideo){
-          // No thumbnail uploaded — show placeholder with play icon
-          thumb=`<div style="width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,#050810,#080e1a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
-              <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="8,5 19,12 8,19"/></svg>
-              </div>
-              <span style="font-family:monospace;font-size:.58rem;color:rgba(255,255,255,.4);letter-spacing:1px">CLICK TO VIEW</span>
-            </div>
-          </div>`;
+      if(item.isVideo && item.mediaUrl){
+        // Video listing — show thumbnail in card
+        if(item.thumbnailUrl){
+          thumb=`<img class="ci lazy-media" data-src="${item.thumbnailUrl}" alt="#ZHR-${zhrId(fid)}" oncontextmenu="return false" draggable="false"/>`;
         } else {
-          // Image — show directly
-          thumb=`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}" oncontextmenu="return false" draggable="false"/>`;
+          thumb=`<div class="cip" style="display:flex;align-items:center;justify-content:center;background:#050810">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,200,0.5)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="rgba(0,212,200,0.4)" stroke="none"/></svg>
+          </div>`;
         }
+      } else if(!item.isVideo && item.mediaUrl){
+        // Image listing — show image directly in card
+        thumb=`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}" oncontextmenu="return false" draggable="false"/>`;
       }
       const dispPrice=fmtPrice(item.discountPrice)||fmtPrice(item.price)||'Ask Price';
       const origPrice=item.discountPrice&&item.price?fmtPrice(item.price):'';
@@ -2674,10 +2781,10 @@ function renderPub(){
     html+=soldItems.map(item=>{
       const fid=item.firestoreId;
       let thumb='<div class="cip" style="display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,200,0.5)" stroke-width="1.5"><rect x="2" y="7" width="20" height="12" rx="3"/><path d="M7 11v4M9 13H5M17 11h2M19 13h-2" stroke-linecap="round"/><circle cx="12" cy="13" r="1" fill="rgba(0,212,200,0.5)"/></svg></div>';
-      if(item.mediaUrl){
-        thumb=item.isVideo
-          ?`<video class="ci-vid lazy-media" data-src="${item.mediaUrl}" data-poster="${cldPoster(item.mediaUrl)}" preload="none" muted playsinline></video>`
-          :`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}"/>`;
+      if(item.isVideo && item.mediaUrl && item.thumbnailUrl){
+        thumb=`<img class="ci lazy-media" data-src="${item.thumbnailUrl}" alt="#ZHR-${zhrId(fid)}"/>`;
+      } else if(!item.isVideo && item.mediaUrl){
+        thumb=`<img class="ci lazy-media" data-src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}"/>`;
       }
       const WA_LINK='https://wa.me/919039763082?text=Is%20anyone%20available%20to%20chat%3F';
       return `<div class="sc sold"><div class="ciw">${thumb}<div class="sold-stamp"><div class="stamp-label"></div></div></div><div class="cb sold-cb"><div class="sold-title">#ZHR-${zhrId(fid)}</div><div class="sold-actions"><span class="sold-tag">SOLD</span><a class="sold-contact" href="${WA_LINK}" target="_blank" rel="noopener"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Contact</a></div></div></div>`;
@@ -2725,10 +2832,13 @@ function renderAdm(){
   g.innerHTML=filtered.map(item=>{
     const fid=item.firestoreId;
     let mediaTh='<div class="ano" style="display:flex;align-items:center;justify-content:center;height:100%"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(0,212,200,0.5)" stroke-width="1.5"><rect x="2" y="7" width="20" height="12" rx="3"/><path d="M7 11v4M9 13H5M17 11h2M19 13h-2" stroke-linecap="round"/><circle cx="12" cy="13" r="1" fill="rgba(0,212,200,0.5)"/></svg></div>';
-    if(item.mediaUrl){
-      mediaTh=item.isVideo
-        ?`<video src="${item.mediaUrl}" controls muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000"></video>`
-        :`<img src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}"/>`;
+    if(item.isVideo && item.mediaUrl){
+      // Video — show thumbnail in admin card if available, else video element
+      mediaTh=item.thumbnailUrl
+        ?`<img src="${item.thumbnailUrl}" alt="#ZHR-${zhrId(fid)}" style="width:100%;height:100%;object-fit:cover;display:block"/>`
+        :`<video src="${item.mediaUrl}" controls muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#000"></video>`;
+    } else if(!item.isVideo && item.mediaUrl){
+      mediaTh=`<img src="${item.mediaUrl}" alt="#ZHR-${zhrId(fid)}" style="width:100%;height:100%;object-fit:cover;display:block"/>`;
     }
     const sc=item.sold?`<div class="asc">SOLD</div>`:'';
     const descPreview = item.desc ? `<div style="font-size:.65rem;color:var(--text2);margin:6px 0;line-height:1.4;max-height:2.8em;overflow:hidden">${esc(item.desc.substring(0,80))}${item.desc.length>80?'...':''}</div>` : '';
@@ -2999,6 +3109,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   });
   window.addEventListener('hashchange',onHash);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){
+      document.querySelectorAll('video').forEach(v=>{ if(!v.paused) v.pause(); });
+    }
+  });
   onHash();
 });
 
@@ -3118,44 +3233,174 @@ function zvpFmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+(s%60<10?'0':'
 function zvpInit(wrap){
   const vid = wrap.querySelector('video');
   if(!vid) return;
-  // Set src from data-src on wrap or from video's own data-src
   const src = wrap.dataset.src || vid.dataset.src;
   if(src && !vid.getAttribute('src')) {
     vid.setAttribute('src', src);
-    vid.load();
+    // preload=none — browser only loads when user hits play or seeks
+    vid.preload='none';
   }
   if(wrap.dataset.zvpReady) return;
   wrap.dataset.zvpReady = '1';
-  const fill = wrap.querySelector('.zvp-progress-fill');
-  const cur  = wrap.querySelector('.zvp-cur');
-  const dur  = wrap.querySelector('.zvp-dur');
+  const fill    = wrap.querySelector('.zvp-fill') || wrap.querySelector('.zvp-progress-fill');
+  const bufBar  = wrap.querySelector('.zvp-buf');
+  const cur     = wrap.querySelector('.zvp-cur');
+  const durEl   = wrap.querySelector('.zvp-dur');
   const playIco = wrap.querySelector('.zvp-play-ico');
+  const prog    = wrap.querySelector('.zvp-prog') || wrap.querySelector('.zvp-progress');
 
-  vid.addEventListener('loadedmetadata', () => { if(dur) dur.textContent = zvpFmt(vid.duration); });
-  vid.addEventListener('timeupdate', () => {
-    if(!vid.duration) return;
-    const pct = (vid.currentTime / vid.duration) * 100;
-    if(fill) fill.style.width = pct + '%';
-    if(cur) cur.textContent = zvpFmt(vid.currentTime);
+  // Click/touch on progress bar to seek — browser only fetches that range
+  if(prog){
+    prog.style.cursor='pointer';
+    const seek = e => {
+      if(!vid.duration) return;
+      const rect=prog.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+      vid.currentTime=pct*vid.duration;
+      // If paused, start playing from new position
+      if(vid.paused) vid.play().catch(()=>{});
+    };
+    prog.addEventListener('click', seek);
+    prog.addEventListener('touchend', e=>{ e.preventDefault(); seek(e); }, {passive:false});
+  }
+
+  // Update buffer bar — shows only what's actually downloaded
+  function updateBuf(){
+    if(!vid.duration || !bufBar) return;
+    try{
+      const buf=vid.buffered;
+      if(buf.length>0){
+        // Find the buffered range containing current time
+        for(let i=0;i<buf.length;i++){
+          if(buf.start(i)<=vid.currentTime && buf.end(i)>=vid.currentTime){
+            bufBar.style.width=(buf.end(i)/vid.duration*100)+'%';
+            break;
+          }
+        }
+      }
+    }catch(e){}
+  }
+
+  // ── Auto-hide controls after 3s like YouTube ──
+  let hideTimer=null;
+  function showControls(){
+    wrap.classList.add('ctrl-visible');
+    clearTimeout(hideTimer);
+    if(!vid.paused){
+      hideTimer=setTimeout(()=>{ wrap.classList.remove('ctrl-visible'); }, 3000);
+    }
+  }
+  function hideControls(){ clearTimeout(hideTimer); wrap.classList.remove('ctrl-visible'); }
+  wrap.addEventListener('mousemove', showControls);
+  wrap.addEventListener('touchstart', ()=>{ showControls(); }, {passive:true});
+  wrap.addEventListener('mouseleave', ()=>{ if(!vid.paused) hideControls(); });
+  vid.addEventListener('play',  ()=>{ showControls(); }); // show briefly on play then hide
+  vid.addEventListener('pause', ()=>{ clearTimeout(hideTimer); wrap.classList.add('ctrl-visible'); });
+
+  // ── Auto-pause when scrolled out of view ──
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting && !vid.paused) vid.pause();
+    });
+  },{threshold:0.2}); // pause when less than 20% visible
+  observer.observe(wrap);
+
+  vid.addEventListener('loadedmetadata', ()=>{
+    if(durEl) durEl.textContent=zvpFmt(vid.duration);
   });
-  vid.addEventListener('play', () => {
+  vid.addEventListener('timeupdate', ()=>{
+    if(!vid.duration) return;
+    const pct=(vid.currentTime/vid.duration)*100;
+    if(fill) fill.style.width=pct+'%';
+    if(cur) cur.textContent=zvpFmt(vid.currentTime);
+    updateBuf();
+  });
+  vid.addEventListener('progress', updateBuf);
+  vid.addEventListener('play', ()=>{
     wrap.classList.add('playing');
     wrap.classList.remove('paused');
-    if(playIco) playIco.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
+    if(playIco) playIco.innerHTML='<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   });
-  vid.addEventListener('pause', () => {
+  vid.addEventListener('pause', ()=>{
     wrap.classList.remove('playing');
     wrap.classList.add('paused');
-    if(playIco) playIco.innerHTML = '<polygon points="6,4 20,12 6,20"/>';
+    if(playIco) playIco.innerHTML='<polygon points="6,4 20,12 6,20"/>';
   });
-  vid.addEventListener('ended', () => {
+  vid.addEventListener('ended', ()=>{
     wrap.classList.remove('playing');
     wrap.classList.add('paused');
-    vid.currentTime = 0;
+    vid.currentTime=0;
+    if(playIco) playIco.innerHTML='<polygon points="6,4 20,12 6,20"/>';
   });
-  vid.addEventListener('error', (e) => {
-    console.error('Video error:', vid.error, 'src:', vid.src);
+  vid.addEventListener('waiting', ()=>{ wrap.classList.add('buffering'); });
+  vid.addEventListener('canplay', ()=>{ wrap.classList.remove('buffering'); });
+  vid.addEventListener('error', ()=>{
+    console.error('Video error:', vid.error?.message, 'src:', vid.src);
   });
+
+  // ── Auto-hide controls after 3s like YouTube ──
+  let _hideTimer=null;
+  function resetHideTimer(){
+    clearTimeout(_hideTimer);
+    wrap.classList.remove('controls-hidden');
+    _hideTimer=setTimeout(()=>{
+      if(!vid.paused) wrap.classList.add('controls-hidden');
+    }, 3000);
+  }
+  wrap.addEventListener('mousemove', resetHideTimer);
+  wrap.addEventListener('touchstart', ()=>{ wrap.classList.remove('controls-hidden'); resetHideTimer(); },{passive:true});
+  vid.addEventListener('play', resetHideTimer);
+  vid.addEventListener('pause', ()=>{ clearTimeout(_hideTimer); wrap.classList.remove('controls-hidden'); });
+  wrap.addEventListener('keydown', e=>{
+    switch(e.key){
+      case ' ':
+      case 'k':
+        e.preventDefault();
+        vid.paused ? vid.play().catch(()=>{}) : vid.pause();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        vid.currentTime=Math.min(vid.duration||0, vid.currentTime+5);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        vid.currentTime=Math.max(0, vid.currentTime-5);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        vid.volume=Math.min(1, vid.volume+0.1);
+        const vsu=wrap.querySelector('.zvp-vol-slider'); if(vsu) vsu.value=vid.volume;
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        vid.volume=Math.max(0, vid.volume-0.1);
+        const vsd=wrap.querySelector('.zvp-vol-slider'); if(vsd) vsd.value=vid.volume;
+        break;
+      case 'm':
+      case 'M':
+        vid.muted=!vid.muted;
+        const ico=wrap.querySelector('.zvp-vol-ico'); if(ico) ico.style.opacity=vid.muted?'0.3':'1';
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        window.zvpFullscreen(wrap);
+        break;
+      case '0': vid.currentTime=0; break;
+      case '1': if(vid.duration) vid.currentTime=vid.duration*0.1; break;
+      case '2': if(vid.duration) vid.currentTime=vid.duration*0.2; break;
+      case '3': if(vid.duration) vid.currentTime=vid.duration*0.3; break;
+      case '4': if(vid.duration) vid.currentTime=vid.duration*0.4; break;
+      case '5': if(vid.duration) vid.currentTime=vid.duration*0.5; break;
+      case '6': if(vid.duration) vid.currentTime=vid.duration*0.6; break;
+      case '7': if(vid.duration) vid.currentTime=vid.duration*0.7; break;
+      case '8': if(vid.duration) vid.currentTime=vid.duration*0.8; break;
+      case '9': if(vid.duration) vid.currentTime=vid.duration*0.9; break;
+    }
+  });
+
+  // Double-click to fullscreen
+  wrap.addEventListener('dblclick', ()=>window.zvpFullscreen(wrap));
 }
 
 window.zvpToggle = function(wrap) {
@@ -3602,35 +3847,21 @@ window._uploadProofs = async function(){
 
       // Upload image to VPS — same endpoint as stock images
       const imageUrl = await new Promise((resolve, reject)=>{
-        const PROOF_MAX_RETRIES = 3;
-        let proofAttempt = 0;
-        function tryProofUpload(){
-          proofAttempt++;
-          setBtn(proofAttempt > 1 ? `Retrying ${i+1}/${total}... (attempt ${proofAttempt})` : `Uploading ${i+1}/${total}...`);
-          const fd = new FormData();
-          fd.append('file', file);
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', VPS_UPLOAD_URL);
-          xhr.setRequestHeader('X-Secret', VPS_SECRET);
-          xhr.timeout = 5 * 60 * 1000;
-          xhr.onload = ()=>{
-            if(xhr.status === 200){
-              try{ resolve(JSON.parse(xhr.responseText).url); }
-              catch(e){ handleProofFail('Bad response from server'); }
-            } else { handleProofFail('Server error: '+xhr.status); }
-          };
-          xhr.ontimeout = ()=> handleProofFail('Upload timed out — slow connection');
-          xhr.onerror   = ()=> handleProofFail('Network error — connection dropped');
-          xhr.send(fd);
-        }
-        function handleProofFail(reason){
-          if(proofAttempt < PROOF_MAX_RETRIES){
-            const waitSec = proofAttempt * 3;
-            setBtn(`${reason}. Retrying in ${waitSec}s...`);
-            setTimeout(tryProofUpload, waitSec * 1000);
-          } else { reject(new Error(reason+` (failed after ${PROOF_MAX_RETRIES} attempts)`)); }
-        }
-        tryProofUpload();
+        const fd = new FormData();
+        fd.append('file', file);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', VPS_UPLOAD_URL);
+        xhr.setRequestHeader('X-Secret', VPS_SECRET);
+        xhr.onload = ()=>{
+          if(xhr.status === 200){
+            const res = JSON.parse(xhr.responseText);
+            resolve(res.url);
+          } else {
+            reject(new Error('VPS error: '+xhr.status+' '+xhr.responseText));
+          }
+        };
+        xhr.onerror = ()=> reject(new Error('Network error — check VPS'));
+        xhr.send(fd);
       });
 
       // Save URL to Firestore — tiny document, loads instantly
