@@ -1181,7 +1181,7 @@ button:active{transform:scale(0.97);transition:transform .1s}
         <label class="fl">Video Thumbnail <span style="color:var(--text2);font-weight:400;font-size:.62rem">(slide to pick frame from video)</span></label>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:9px">
           <div style="position:relative;width:100%;aspect-ratio:16/9;background:#050a14;border-radius:4px;overflow:hidden">
-            <video id="f_thumb_video" crossorigin="anonymous" muted playsinline style="width:100%;height:100%;object-fit:contain;display:block"></video>
+            <video id="f_thumb_video" muted playsinline style="width:100%;height:100%;object-fit:contain;display:block"></video>
             <div id="f_thumb_loading" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;font-size:.72rem;color:var(--accent);font-family:'Barlow Condensed',sans-serif">Extracting frame...</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
@@ -1701,11 +1701,10 @@ function onFileSelect(inp){
     // Reset thumbnail
     const tUrl=document.getElementById('f_thumb_url');if(tUrl)tUrl.value='';
     const tSel=document.getElementById('f_thumb_selected');if(tSel)tSel.style.display='none';
-    const tVid=document.getElementById('f_thumb_video');if(tVid){tVid.src='';tVid.load();}
     const tSldr=document.getElementById('f_thumb_slider');if(tSldr)tSldr.value=0;
     const tTime=document.getElementById('f_thumb_time');if(tTime)tTime.textContent='0:00';
     const tDur=document.getElementById('f_thumb_dur');if(tDur)tDur.textContent='0:00';
-    const ta=document.getElementById('thumb-upload-area');if(ta)ta.style.display='none';
+    const ta=document.getElementById('thumb-upload-area');if(ta)ta.style.display='';
     // Show upload button
     if(uploadBtn){
       uploadBtn.style.display='flex';
@@ -1714,6 +1713,8 @@ function onFileSelect(inp){
       uploadBtn.style.background='#00d4d4';
       uploadBtn.style.color='#000';
     }
+    // Init thumb selector immediately with local blob — no upload needed yet
+    window.initThumbSelector(objUrl, 0, true);
   }
 }
 
@@ -1787,7 +1788,7 @@ window.startVideoUpload=function(){
     pendingFile=null;
     if(btn){btn.textContent='✅ Done! Pick thumbnail below';btn.style.background='#22c55e';btn.style.color='#fff';setTimeout(()=>{btn.style.display='none';},2500);}
     const ta=document.getElementById('thumb-upload-area');if(ta)ta.style.display='';
-    if(window.initThumbSelector)window.initThumbSelector(result.url,result.duration||0);
+    if(window.initThumbSelector)window.initThumbSelector(result.url,result.duration||0,false);
   }).catch(err=>{
     _showUploadControls(false);
     if(_uploadCancelled)return;
@@ -2027,6 +2028,11 @@ async function submitForm(){
       pendingFile=null;
     }
 
+    // Upload local thumbnail to VPS if it's a canvas blob
+    if(_thumbLocalBlob){
+      await _uploadLocalThumb();
+    }
+
     const data={
       desc:document.getElementById('f2').value.trim(),
       price:document.getElementById('f3').value.trim(),
@@ -2042,7 +2048,7 @@ async function submitForm(){
       kdRatio:         document.getElementById('f_kd')?.value.trim()||'',
       sold:document.getElementById('f7').checked,
       instantDelivery:document.getElementById('f_instant')?.checked||false,
-      thumbnailUrl:   document.getElementById('f_thumb_url')?.value||'',
+      thumbnailUrl: (document.getElementById('f_thumb_url')?.value||'').replace('_local_',''),
       rating:         parseFloat(document.getElementById('f_rating')?.value||'5'),
       server:         document.getElementById('f_server')?.value||'Global',
       hasGlacier:     document.getElementById('f_glacier')?.checked||false,
@@ -2124,8 +2130,13 @@ function editItem(fid){
   // Show existing media
   const imgPre=document.getElementById('imgPre'),vidPre=document.getElementById('vidPre');
   if(item.mediaUrl){
-    if(item.isVideo){vidPre.src=item.mediaUrl;vidPre.style.display='block';imgPre.style.display='none';}
-    else{imgPre.src=item.mediaUrl;imgPre.style.display='block';vidPre.style.display='none';}
+    if(item.isVideo){
+      vidPre.innerHTML='<video src="'+item.mediaUrl+'" controls muted playsinline style="width:100%;max-height:180px;display:block;background:#000;border-radius:6px"></video>';
+      vidPre.style.display='block';imgPre.innerHTML='';imgPre.style.display='none';
+    } else {
+      imgPre.innerHTML='<img src="'+item.mediaUrl+'" style="width:100%;max-height:180px;object-fit:contain;display:block;border-radius:6px"/>';
+      imgPre.style.display='block';vidPre.innerHTML='';vidPre.style.display='none';
+    }
   }
   // Update UI
   document.getElementById('form-title-label').innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> EDIT ACCOUNT<span class="apt-mode editing" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">EDITING</span>';
@@ -2138,6 +2149,7 @@ function editItem(fid){
 }
 function cancelEdit(){
   editingId=null;pendingFile=null;window._uploadedResult=null;
+  _thumbLocalBlob=null;_thumbIsLocal=false;
   clearForm();
   document.getElementById('form-title-label').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ADD NEW ACCOUNT<span class="apt-mode adding" id="form-mode-badge" style="margin-left:12px;font-size:.65rem;padding:3px 10px;border-radius:3px">ADDING</span>';
   document.getElementById('uplBtnTxt').textContent='ADD ACCOUNT';
@@ -2156,7 +2168,7 @@ function clearForm(){
   const thumbStatus = document.getElementById('f_thumb_status'); if(thumbStatus) thumbStatus.textContent='';
   const thumbFile = document.getElementById('f_thumb_file'); if(thumbFile) thumbFile.value='';
   const thumbArea = document.getElementById('thumb-upload-area'); if(thumbArea) thumbArea.style.display='none';
-  const uploadArea = document.getElementById('media-upload-area'); if(uploadArea) uploadArea.style.display='none';
+  const uploadArea = document.getElementById('media-upload-area'); if(uploadArea) uploadArea.style.display='';
   // Reset skin images
   [1,2,3].forEach(n=>{
     const u=document.getElementById('f_skin'+n); if(u) u.value='';
@@ -2179,10 +2191,15 @@ function clearForm(){
   if(document.getElementById('f_thumb_time')) document.getElementById('f_thumb_time').textContent='0:00';
   if(document.getElementById('f_thumb_dur')) document.getElementById('f_thumb_dur').textContent='0:00';
   if(document.getElementById('f_thumb_slider')) document.getElementById('f_thumb_slider').value=0;
+  // Reset thumb video element and local blob state
+  const tVid=document.getElementById('f_thumb_video');
+  if(tVid){tVid.src='';tVid.load();}
+  _thumbLocalBlob=null;
+  _thumbIsLocal=false;
   document.getElementById('imgPre').style.display='none';
-  document.getElementById('imgPre').src='';
+  document.getElementById('imgPre').innerHTML='';
   document.getElementById('vidPre').style.display='none';
-  document.getElementById('vidPre').src='';
+  document.getElementById('vidPre').innerHTML='';
   document.getElementById('progWrap').style.display='none';
   pendingFile=null;
   document.getElementById('f3').focus();
@@ -3408,16 +3425,20 @@ window.zvpToggle = function(wrap) {
   const vid = wrap.querySelector('video');
   if(!vid) return;
   document.querySelectorAll('.zvp-wrap').forEach(w => {
-    if(w !== wrap) { const v = w.querySelector('video'); if(v) { v.pause(); w.classList.remove('playing'); w.classList.add('paused'); } }
+    if(w !== wrap){ const v=w.querySelector('video'); if(v&&!v.paused){v.pause();w.classList.remove('playing');w.classList.add('paused');} }
   });
-  const playPromise = vid.paused ? vid.play() : Promise.resolve(vid.pause());
-  if(playPromise) playPromise.catch(e => console.error('Play error:', e));
+  if(vid.paused){
+    vid.play().catch(e=>console.error('Play error:',e));
+  } else {
+    vid.pause();
+  }
 };
 
 window.zvpSeek = function(e, wrap) {
   zvpInit(wrap);
   const vid = wrap.querySelector('video');
-  const bar = wrap.querySelector('.zvp-progress');
+  const bar = wrap.querySelector('.zvp-prog') || wrap.querySelector('.zvp-progress');
+  if(!bar || !vid) return;
   const rect = bar.getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   vid.currentTime = pct * (vid.duration || 0);
@@ -3431,9 +3452,14 @@ window.zvpMute = function(wrap) {
 };
 
 window.zvpFullscreen = function(wrap) {
-  const vid = wrap.querySelector('video');
-  if(vid.requestFullscreen) vid.requestFullscreen();
-  else if(vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
+  const el = wrap || document.getElementById('zvp-det');
+  if(!el) return;
+  if(document.fullscreenElement){
+    document.exitFullscreen && document.exitFullscreen();
+  } else {
+    if(el.requestFullscreen) el.requestFullscreen();
+    else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }
 };
 
 // Card video play
@@ -3453,129 +3479,184 @@ let _thumbVideoDur = 0;
 
 function zvpFmt2(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
 
-window.initThumbSelector = function(videoUrl, duration){
+// Track if thumb is from local file (blob) or remote VPS URL
+let _thumbIsLocal = false;
+let _thumbLocalBlob = null; // base64 pending upload on save
+
+window.initThumbSelector = function(videoUrl, duration, isLocal){
   _thumbVideoDur = duration || 0;
+  _thumbIsLocal = !!isLocal;
+  _thumbLocalBlob = null;
   const vid = document.getElementById('f_thumb_video');
   const slider = document.getElementById('f_thumb_slider');
   const durEl = document.getElementById('f_thumb_dur');
   const timeEl = document.getElementById('f_thumb_time');
   const thumbArea = document.getElementById('thumb-upload-area');
+  const status = document.getElementById('f_thumb_status');
   if(thumbArea) thumbArea.style.display = '';
   if(!vid) return;
-  vid.crossOrigin = 'anonymous';
+
+  // Local blob = no crossOrigin needed, remote = need CORS
+  if(isLocal){ vid.removeAttribute('crossorigin'); }
+  else { vid.crossOrigin = 'anonymous'; }
   vid.src = videoUrl;
   vid.muted = true;
+  vid.preload = 'metadata';
   vid.load();
+
+  if(slider){ slider.value=0; slider.disabled=true; }
+  if(status) status.textContent = 'Loading...';
+
   vid.addEventListener('loadedmetadata', ()=>{
     if(!_thumbVideoDur) _thumbVideoDur = vid.duration || 0;
     if(durEl) durEl.textContent = zvpFmt2(_thumbVideoDur);
-  }, {once:true});
-  vid.addEventListener('loadeddata', ()=>{
-    // Now we can actually seek — auto-capture at 10% of duration
-    const autoTs = Math.min(2, (_thumbVideoDur || vid.duration || 5) * 0.1);
-    if(slider) slider.value = Math.round((autoTs / (_thumbVideoDur || vid.duration || 1)) * 100);
+    if(slider){ slider.disabled=false; slider.value=10; }
+    const autoTs = _thumbVideoDur * 0.1;
     if(timeEl) timeEl.textContent = zvpFmt2(autoTs);
-    window.captureThumb(autoTs);
-  }, {once:true});
-  if(slider) slider.value = 0;
+    if(status) status.textContent = '';
+    vid.currentTime = autoTs;
+  },{once:true});
+
+  // After first seek settles — capture frame
+  let _firstSeekDone = false;
+  vid.addEventListener('seeked', function onFirstSeek(){
+    if(_firstSeekDone) return;
+    _firstSeekDone = true;
+    vid.removeEventListener('seeked', onFirstSeek);
+    if(isLocal){ _captureCanvas(vid); }
+    else { _captureVPS(vid.src, _thumbVideoDur*0.1); }
+  });
+
+  vid.addEventListener('error', ()=>{
+    if(slider) slider.disabled = false;
+    if(status) status.textContent = '';
+    if(!isLocal) _captureVPS(vid.src, 0);
+  },{once:true});
 };
 
-window.thumbSliderMove = function(sl){
-  const vid = document.getElementById('f_thumb_video');
-  const el = document.getElementById('f_thumb_time');
-  const dur = _thumbVideoDur || vid?.duration || 0;
-  if(!dur) return;
-  const ts = (sl.value / 100) * dur;
-  if(el) el.textContent = zvpFmt2(ts);
-  // Seek video for live preview — muted so no audio blip
-  if(vid){ vid.muted = true; vid.currentTime = ts; }
-};
-
-window.thumbSliderCommit = function(sl){
-  const vid = document.getElementById('f_thumb_video');
-  const dur = _thumbVideoDur || vid?.duration || 0;
-  if(!dur) return;
-  const ts = (sl.value / 100) * dur;
-  // Small delay to let the seek settle before canvas capture
-  setTimeout(() => window.captureThumb(ts), 150);
-};
-
-window.captureThumb = async function(ts){
-  const sl  = document.getElementById('f_thumb_slider');
-  const vid = document.getElementById('f_thumb_video');
+// ── Instant canvas capture (local blob, no network) ──
+function _captureCanvas(vid){
+  const status = document.getElementById('f_thumb_status');
   const loading = document.getElementById('f_thumb_loading');
-  const status  = document.getElementById('f_thumb_status');
-  const dur = _thumbVideoDur || vid?.duration || 0;
-  const timestamp = ts !== undefined ? ts : (sl ? (sl.value / 100) * dur : 0);
+  try{
+    const canvas = document.createElement('canvas');
+    let w=vid.videoWidth||1280, h=vid.videoHeight||720;
+    const MAX=1080; if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+    canvas.width=w; canvas.height=h;
+    canvas.getContext('2d').drawImage(vid,0,0,w,h);
+    const b64 = canvas.toDataURL('image/jpeg',0.85);
+    if(b64.length>2000){
+      _thumbLocalBlob = b64;
+      document.getElementById('f_thumb_url').value = '_local_';
+      const prev=document.getElementById('f_thumb_preview');
+      if(prev){prev.src=b64;prev.style.display='block';}
+      const sel=document.getElementById('f_thumb_selected');
+      if(sel) sel.style.display='flex';
+      if(status) status.textContent='';
+      if(loading) loading.style.display='none';
+      return;
+    }
+  }catch(e){}
+  // Canvas tainted — fall through to VPS
+  const vid2=document.getElementById('f_thumb_video');
+  if(vid2&&vid2.src) _captureVPS(vid2.src, vid2.currentTime);
+}
 
-  if(!vid || !vid.src){ if(status) status.textContent='Upload video first'; return; }
-
+// ── VPS server-side extraction (remote videos) ──
+async function _captureVPS(videoUrl, ts){
+  const status=document.getElementById('f_thumb_status');
+  const loading=document.getElementById('f_thumb_loading');
   if(loading) loading.style.display='flex';
-  if(status)  status.textContent='Capturing frame...';
-
-  // ── Try canvas (works if CORS headers are set on VPS) ──
-  let canvasDone = false;
-  if(vid.crossOrigin === 'anonymous'){
+  if(status) status.textContent='Extracting frame...';
+  const THUMB_URL=VPS_UPLOAD_URL.replace('/upload','/thumbnail');
+  for(let attempt=1;attempt<=3;attempt++){
     try{
-      await new Promise((res)=>{
-        const onSeeked = ()=>{ vid.removeEventListener('seeked',onSeeked); res(); };
-        vid.addEventListener('seeked', onSeeked);
-        vid.currentTime = timestamp;
-        setTimeout(res, 1200);
-      });
-      const canvas = document.createElement('canvas');
-      let w = vid.videoWidth||1280, h = vid.videoHeight||720;
-      const MAX=1080; if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(vid,0,0,w,h);
-      const b64 = canvas.toDataURL('image/jpeg',0.88);
-      // If canvas is tainted it returns a 1x1 or throws — check size
-      if(b64.length > 5000){
-        document.getElementById('f_thumb_url').value = b64;
-        const prev=document.getElementById('f_thumb_preview'); if(prev){prev.src=b64;prev.style.display='block';}
-        const sel=document.getElementById('f_thumb_selected'); if(sel) sel.style.display='flex';
-        if(status) status.textContent='';
-        canvasDone = true;
-      }
-    } catch(e){ /* CORS blocked — fall through to VPS */ }
-  }
-
-  if(canvasDone){ if(loading) loading.style.display='none'; return; }
-
-  // ── VPS server-side extraction with retry ──
-  const THUMB_URL = VPS_UPLOAD_URL.replace('/upload','/thumbnail');
-  const MAX_TRIES = 3;
-  let lastErr = '';
-  for(let attempt=1; attempt<=MAX_TRIES; attempt++){
-    try{
-      if(status) status.textContent = attempt>1 ? `Retrying (${attempt}/${MAX_TRIES})...` : 'Extracting frame...';
-      const controller = new AbortController();
-      const timer = setTimeout(()=>controller.abort(), 10000);
-      const resp = await fetch(THUMB_URL,{
+      if(status&&attempt>1) status.textContent=`Retrying (${attempt}/3)...`;
+      const ctrl=new AbortController();
+      const t=setTimeout(()=>ctrl.abort(),15000);
+      const resp=await fetch(THUMB_URL,{
         method:'POST',
         headers:{'Content-Type':'application/json','X-Secret':VPS_SECRET},
-        body: JSON.stringify({videoUrl:vid.src, timestamp: Math.round(timestamp*10)/10}),
-        signal: controller.signal
+        body:JSON.stringify({videoUrl,timestamp:Math.round((ts||0)*10)/10}),
+        signal:ctrl.signal
       });
-      clearTimeout(timer);
-      const data = await resp.json();
+      clearTimeout(t);
+      const data=await resp.json();
       if(data.url){
-        document.getElementById('f_thumb_url').value = data.url;
-        const prev=document.getElementById('f_thumb_preview'); if(prev){prev.src=data.url;prev.style.display='block';}
-        const sel=document.getElementById('f_thumb_selected'); if(sel) sel.style.display='flex';
+        _thumbLocalBlob=null;
+        document.getElementById('f_thumb_url').value=data.url;
+        const prev=document.getElementById('f_thumb_preview');if(prev){prev.src=data.url;prev.style.display='block';}
+        const sel=document.getElementById('f_thumb_selected');if(sel) sel.style.display='flex';
         if(status) status.textContent='';
         if(loading) loading.style.display='none';
         return;
       }
-      lastErr = data.error||'No URL returned';
-    } catch(e){
-      lastErr = e.name==='AbortError' ? 'Timeout' : e.message;
-      if(attempt < MAX_TRIES) await new Promise(r=>setTimeout(r, 1000*attempt));
-    }
+    }catch(e){ if(attempt<3) await new Promise(r=>setTimeout(r,1000*attempt)); }
   }
-  // All retries failed — offer manual upload fallback
-  if(status) status.textContent=`❌ Server busy — please use "Upload Image" below instead`;
+  if(status) status.textContent='❌ Failed — use "Upload Image" instead';
   if(loading) loading.style.display='none';
+}
+
+// ── Upload pending local thumbnail to VPS before saving ──
+async function _uploadLocalThumb(){
+  if(!_thumbLocalBlob) return null;
+  const status=document.getElementById('f_thumb_status');
+  if(status) status.textContent='Uploading thumbnail...';
+  try{
+    const res=await fetch(_thumbLocalBlob);
+    const blob=await res.blob();
+    const fd=new FormData();
+    fd.append('file',blob,'thumb.jpg');
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST',VPS_UPLOAD_URL);
+    xhr.setRequestHeader('X-Secret',VPS_SECRET);
+    const url=await new Promise((resolve,reject)=>{
+      xhr.onload=()=>{ if(xhr.status===200){try{resolve(JSON.parse(xhr.responseText).url);}catch(e){reject(e);}}else reject(new Error('Upload failed'));};
+      xhr.onerror=()=>reject(new Error('Network error'));
+      xhr.send(fd);
+    });
+    _thumbLocalBlob=null;
+    document.getElementById('f_thumb_url').value=url;
+    if(status) status.textContent='';
+    return url;
+  }catch(e){
+    if(status) status.textContent='❌ Thumbnail upload failed';
+    throw e;
+  }
+}
+
+window.captureThumb = function(ts){
+  const vid=document.getElementById('f_thumb_video');
+  const sl=document.getElementById('f_thumb_slider');
+  const dur=_thumbVideoDur||vid?.duration||0;
+  const timestamp=ts!==undefined?ts:(sl?(sl.value/100)*dur:0);
+  if(!vid||!vid.src) return;
+  if(_thumbIsLocal){ _captureCanvas(vid); }
+  else { _captureVPS(vid.src,timestamp); }
+};
+
+window.thumbSliderMove = function(sl){
+  const vid=document.getElementById('f_thumb_video');
+  const el=document.getElementById('f_thumb_time');
+  const dur=_thumbVideoDur||vid?.duration||0;
+  if(!dur) return;
+  const ts=(sl.value/100)*dur;
+  if(el) el.textContent=zvpFmt2(ts);
+  if(vid&&vid.readyState>=1) vid.currentTime=ts;
+};
+
+window.thumbSliderCommit = function(sl){
+  const vid=document.getElementById('f_thumb_video');
+  const dur=_thumbVideoDur||vid?.duration||0;
+  if(!dur||!vid||!vid.src) return;
+  const ts=(sl.value/100)*dur;
+  if(_thumbIsLocal){
+    vid.currentTime=ts;
+    const onSeeked=()=>{ vid.removeEventListener('seeked',onSeeked); _captureCanvas(vid); };
+    vid.addEventListener('seeked',onSeeked);
+  } else {
+    _captureVPS(vid.src,ts);
+  }
 };
 
 window.previewThumb = async function(input){
